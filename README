@@ -1,0 +1,12 @@
+My name is Beth Werbaneth, and for the next couple of months I’m going to 
+be working on developing a few simple games with SFML 1.6 (Simple and Fast 
+Multimedia Library) and C++. The intent is to provide a few examples for 
+people who are unsure of how to get started, and I feel that once one has 
+the opportunity to see how a few things can be implemented, their own 
+creativity can take it from there. I only started with SFML a few months 
+ago myself, so this will be a bit of a learning process for me, as well. 
+At any rate, I will be writing everything from scratch, and I will try to
+ maintain this log fairly consistently, so if you find something that 
+seems unclear, please refer to this document.
+
+https://docs.google.com/document/d/19nZQfhzIUHToWpJszQ8OTsqfbE_HSRYW95a4Bm1oIks/edit?hl=en_US
