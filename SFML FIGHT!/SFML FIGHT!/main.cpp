@@ -11,9 +11,7 @@ int main(){
 	//initialize the game window
 	sf::RenderWindow App(sf::VideoMode(1280, 800), "SFML FIGHT!");
 	player* player_1=new FIGHTBETH("player1");
-	player* player_2=new FIGHTBETH("player2");
-
-	//std::string test=player_1->get_name().GetText();
+	player* player_2=new FIGHTDAN("player2");
 
 
 	bool p1lock=false, p2lock=false;
@@ -25,9 +23,6 @@ int main(){
 	special_attack* p1spec;
 	special_attack* p2spec;
 
-	sf::Image Image;
-	Image.LoadFromFile("beth-idle-bnw.png");
-	sf::Sprite Sprite(Image);
 
 	/*
 	//countdown!
@@ -53,7 +48,7 @@ int main(){
 
 	//GAME LOOP
 	timer.Reset();
-	while(App.IsOpened()&&timer.GetElapsedTime()<30&&game_over==false){
+	while(App.IsOpened()/*&&timer.GetElapsedTime()<60*/&&game_over==false){
 
 		//EVENT HANDLING
 		sf::Event Event;
@@ -69,9 +64,9 @@ int main(){
 		if(p1lock==false){
 			//movement
 			if(App.GetInput().IsKeyDown(sf::Key::A))
-				player_1->adjust(-150*ElapsedTime, 0);
+				player_1->adjust(-150*ElapsedTime, 0, player_2->get_pos());
 			if(App.GetInput().IsKeyDown(sf::Key::D))
-				player_1->adjust(150*ElapsedTime, 0);
+				player_1->adjust(150*ElapsedTime, 0, player_2->get_pos());
 			//punch
 			if(App.GetInput().IsKeyDown(sf::Key::G)){
 				if(player_1->punch(player_2->get_pos(), player_2->get_state()))
@@ -90,10 +85,7 @@ int main(){
 			else if(App.GetInput().IsKeyDown(sf::Key::B)){
 				p1_special=true;
 				//if we are to the left of the enemy
-				if(player_1->get_pos().x < player_2->get_pos().x)
-					p1spec=player_1->special(player_1->get_pos(), true);
-				else
-					p1spec=player_1->special(player_1->get_pos(), false);
+				p1spec=player_1->special(player_2->get_pos());
 				p1lock=true;
 				p1Clock.Reset();
 			}
@@ -130,9 +122,9 @@ int main(){
 		if(p2lock==false){
 			//movement
 			if(App.GetInput().IsKeyDown(sf::Key::Left))
-				player_2->adjust(-150*ElapsedTime, 0);
+				player_2->adjust(-150*ElapsedTime, 0, player_1->get_pos());
 			if(App.GetInput().IsKeyDown(sf::Key::Right))
-				player_2->adjust(150*ElapsedTime, 0);
+				player_2->adjust(150*ElapsedTime, 0, player_1->get_pos());
 			//punch
 			if(App.GetInput().IsKeyDown(sf::Key::SemiColon)){
 				if(player_2->punch(player_1->get_pos(), player_1->get_state()))
@@ -150,10 +142,8 @@ int main(){
 			//special
 			else if(App.GetInput().IsKeyDown(sf::Key::Slash)){
 				p2_special=true;
-				if(player_2->get_pos().x < player_1->get_pos().x)
-					p2spec=player_2->special(player_2->get_pos(), true);
-				else
-					p2spec=player_2->special(player_2->get_pos(), false);
+				//testing
+				p2spec=player_2->special(player_1->get_pos());
 				p2lock=true;
 				p2Clock.Reset();
 			}
@@ -200,25 +190,24 @@ int main(){
 		App.Draw(player_2->get_health());
 		//drawing specials
 		if(p1_special){
+			App.Draw(p1spec->get_image(ElapsedTime, p1_special));
 			if(p1spec->collides(player_2->get_pos(), player_2->get_Sprite().GetSize(), 
 				player_2->get_state())){
 					game_over=player_2->take_damage(40);
 					p1_special=false;
 			}
-			App.Draw(p1spec->get_image(ElapsedTime, p1_special));
 		}
 		if(p2_special){
+			App.Draw(p2spec->get_image(ElapsedTime, p2_special));
 			if(p2spec->collides(player_1->get_pos(), player_1->get_Sprite().GetSize(), 
 				player_1->get_state())){
 					game_over=player_1->take_damage(40);
 					p2_special=false;
 			}
-			App.Draw(p2spec->get_image(ElapsedTime, p2_special));
 		}
 		//drawing characters
 		App.Draw(player_1->get_Sprite());
 		App.Draw(player_2->get_Sprite());
-		App.Draw(Sprite);
 		App.Display();
 
 	}

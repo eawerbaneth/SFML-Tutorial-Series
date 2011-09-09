@@ -39,4 +39,18 @@ private:
 	bool advance(float ElapsedTime);
 };
 
+class hawk: public special_attack{
+public:
+	hawk();
+	hawk(sf::Vector2f my_pos, sf::Vector2f enemy_pos);
+	~hawk();
+	sf::Sprite get_image(float ElapsedTime, bool &alive);
+	bool collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::string enemy_state);
+
+private:
+	sf::Sprite image;
+	std::vector <sf::Vector2f> path;
+	void generate_parabola(sf::Vector2f enemy_pos, bool dir);
+	bool advance(float ElapsedTime);
+};
 

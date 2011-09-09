@@ -9,14 +9,14 @@ public:
 	player(std::string new_name);
 
 	//movement utilities
-	void adjust(float x_offset, float y_offset);
+	void adjust(float x_offset, float y_offset, sf::Vector2f enemy_pos);
 
 	//attack utilities
 	bool punch(sf::Vector2f enemy_pos, std::string enemy_state);
 	bool kick(sf::Vector2f enemy_pos, std::string enemy_state);
 	void block();
 	void release_state(sf::Vector2f enemy_pos);
-	virtual special_attack* special(sf::Vector2f pos, bool dir);
+	virtual special_attack* special(sf::Vector2f enemy_pos);
 
 	//accessing privates
 	std::string get_state();
@@ -36,6 +36,7 @@ protected:
 	health_bar health;
 	std::vector <sf::Image> states;
 
+
 };
 
 //SPECIALIZED CHARACTERS
@@ -43,7 +44,7 @@ class FIGHTBETH : public player{
 public:
 	FIGHTBETH();
 	FIGHTBETH(std::string pos);
-	blast *special(sf::Vector2f pos, bool dir);
+	blast *special(sf::Vector2f enemy_pos);
 
 };
 
@@ -51,5 +52,7 @@ class FIGHTDAN : public player{
 public:
 	FIGHTDAN();
 	FIGHTDAN(std::string pos);
-	void special();
+	hawk *special(sf::Vector2f enemy_pos); 
+	
 };
+

@@ -1,4 +1,5 @@
-#include "misc.h"	
+#include "misc.h"
+#include <cmath>
 
 health_bar::health_bar(){
 	health=100;
@@ -30,6 +31,7 @@ void health_bar::set_pos(float x){
 //SPECIAL ATTACKS
 special_attack::special_attack(){}
 
+//blast
 blast::blast(){}
 
 blast::blast(sf::Vector2f pos, bool dir){
@@ -71,6 +73,9 @@ bool blast::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::strin
 			direction=true;
 			return false;
 		}
+		//or they just blocked it
+		if(enemy_state=="BLOCK")
+			return false;
 		//in all other cases, they get damaged
 		return true;
 	}
@@ -82,6 +87,9 @@ bool blast::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::strin
 			direction=false;
 			return false;
 		}
+		//or they just blocked it
+		if(enemy_state=="BLOCK")
+			return false;
 		//in all other cases, they get damaged
 		return true;
 	}
@@ -89,3 +97,100 @@ bool blast::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::strin
 		return false;
 	}
 }
+
+//hawk
+
+hawk::hawk(){}
+
+hawk::hawk(sf::Vector2f my_pos, sf::Vector2f enemy_pos){
+	//initialize sprite
+	image.Resize(50, 50);
+	image.SetColor(sf::Color::Red);
+	//check which direction first sweep is going to be
+	if(my_pos.x<enemy_pos.x)//enemy is to our right
+		generate_parabola(enemy_pos, true);
+	else
+		generate_parabola(enemy_pos, false);
+	image.SetPosition(path[0]);
+	path.erase(path.begin());
+}
+
+hawk::~hawk(){}
+
+sf::Sprite hawk::get_image(float ElapsedTime, bool &alive){
+	alive=advance(ElapsedTime);
+	return image;
+}
+
+bool hawk::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::string enemy_state){
+	//enemy is to the left and we've collided
+	if(enemy_pos.x+enemy_size.x>=image.GetPosition().x&&
+		enemy_pos.x+enemy_size.x<=image.GetPosition().x+image.GetSize().x
+		&&enemy_pos.y<=image.GetPosition().y+image.GetSize().y){
+		//they're parrying it with a punch
+		if(enemy_state=="BLOCK"){
+			return false;
+		}
+		//in all other cases, they get damaged
+		return true;
+	}
+	//enemy is to the right and we've collided
+	else if(enemy_pos.x>=image.GetPosition().x+image.GetSize().x&&
+		enemy_pos.x<=image.GetPosition().x
+		&&enemy_pos.y<=image.GetPosition().y+image.GetSize().y){
+		//blocked
+		if(enemy_state=="BLOCK"){
+			return false;
+		}
+		//in all other cases, they get damaged
+		return true;
+	}
+	//we didn't collide at all
+	else{
+		return false;
+	}
+}
+
+void hawk::generate_parabola(sf::Vector2f enemy_pos, bool dir){
+	if(dir==true){
+		for(float i=-200; i<=200; i+=100){
+			float y=1000-((i*i)/90);
+			path.push_back(sf::Vector2f(enemy_pos.x+i, y));
+		}
+	}
+	else{
+		for(float i=200; i>=-200; i-=100){
+			float y=1000-((i*i)/90);
+			path.push_back(sf::Vector2f(enemy_pos.x+i, y));
+		}
+	}
+
+}
+
+float get_dist(sf::Vector2f p1, sf::Vector2f p2){
+	return sqrt(pow(p1.x-p2.x, 2)+pow(p1.y-p2.y, 2));
+}
+
+float get_angle(sf::Vector2f p1, sf::Vector2f p2){
+	return -atan((p1.y-p2.y)/(p1.x-p2.x));
+}
+
+
+
+bool hawk::advance(float ElapsedTime){
+	//ElapsedTime = 1;
+	if(path.size()==0)
+		return false;
+	//move towards path[0]
+	else{
+		//determine angle we want to move to
+		float angle=get_angle(image.GetPosition(), path[0]);
+		//move as far as we can this frame
+		image.Move(100*-sin(angle)*ElapsedTime, 100*cos(angle)*ElapsedTime);
+		//if we're close enough, clear the checkpoint
+		if(get_dist(image.GetPosition(), path[0])<30)
+			path.erase(path.begin());
+	}
+	return true;
+}
+
