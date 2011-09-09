@@ -203,7 +203,7 @@ int main(){
 			App.Draw(p1spec->get_image(ElapsedTime, p1_special));
 			if(p1spec->collides(player_2->get_pos(), player_2->get_Sprite().GetSize(), 
 				player_2->get_state())){
-					game_over=player_2->take_damage(40, player_2->get_pos());
+					game_over=player_2->take_damage(40, player_1->get_pos());
 					p1_special=false;
 			}
 		}

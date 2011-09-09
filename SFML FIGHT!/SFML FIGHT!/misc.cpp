@@ -53,13 +53,13 @@ sf::Sprite blast::get_image(float ElapsedTime, bool &alive){
 bool blast::advance(float ElapsedTime){
 	//if the blast is going left
 	if(direction==false){
-		image.Move(-300*ElapsedTime, 0);
+		image.Move(-500*ElapsedTime, 0);
 		if(image.GetPosition().x<0)
 			return false;
 	}
 	//blast is going right
 	else{
-		image.Move(300*ElapsedTime, 0);
+		image.Move(500*ElapsedTime, 0);
 		if(image.GetPosition().x>1280)
 			return false;
 	}
@@ -125,6 +125,8 @@ sf::Sprite hawk::get_image(float ElapsedTime, bool &alive){
 }
 
 bool hawk::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::string enemy_state){
+	//debugging
+	//return false;
 	//enemy is to the left and we've collided
 	if(enemy_pos.x+enemy_size.x>=image.GetPosition().x&&
 		enemy_pos.x+enemy_size.x<=image.GetPosition().x+image.GetSize().x
@@ -155,14 +157,14 @@ bool hawk::collides(sf::Vector2f enemy_pos, sf::Vector2f enemy_size, std::string
 
 void hawk::generate_parabola(sf::Vector2f enemy_pos, bool dir){
 	if(dir==true){
-		for(float i=-200; i<=200; i+=100){
-			float y=1000-((i*i)/90);
+		for(float i=-300; i<=300; i+=150){
+			float y=600-((i*i)/500);
 			path.push_back(sf::Vector2f(enemy_pos.x+i, y));
 		}
 	}
 	else{
-		for(float i=200; i>=-200; i-=100){
-			float y=1000-((i*i)/90);
+		for(float i=300; i>=-300; i-=150){
+			float y=600-((i*i)/500);
 			path.push_back(sf::Vector2f(enemy_pos.x+i, y));
 		}
 	}
@@ -174,28 +176,23 @@ float get_dist(sf::Vector2f p1, sf::Vector2f p2){
 }
 
 float get_angle(sf::Vector2f p1, sf::Vector2f p2){
-	return atan2((p1.y-p2.y), (p1.x-p2.x));
+	float angle= atan2((p1.y-p2.y), (p1.x-p2.x));
+	return PI+angle;
+
 }
 
 bool hawk::advance(float ElapsedTime){
-	//ElapsedTime = 1;
 	if(path.size()==0)
 		return false;
 	//move towards path[0]
 	else{
 		//determine angle we want to move to
 		float angle=get_angle(image.GetPosition(), path[0]);
-		std::cout << "\tAngle: " << angle*180/PI << "\n";
 		//move as far as we can this frame
-		old_pos = image.GetPosition();
-		image.Move(100*sin(angle)*ElapsedTime, 100*cos(angle)*ElapsedTime);
+		image.Move(200*cos(angle)*ElapsedTime, 200*sin(angle)*ElapsedTime);
 		//if we're close enough, clear the checkpoint
-		if(get_dist(image.GetPosition(), path[0])>get_dist(old_pos, path[0])){
-			std::cout << "Passed checkpoint (" << image.GetPosition().x << ", "<< image.GetPosition().y << ")\t\n"
-				<< "path[0]: (" << path[0].x << ", " << path[0].y << "\n";
+		if(get_dist(image.GetPosition(), path[0])>get_dist(old_pos, path[0]))
 			path.erase(path.begin());
-			
-		}
 	}
 	return true;
 }
