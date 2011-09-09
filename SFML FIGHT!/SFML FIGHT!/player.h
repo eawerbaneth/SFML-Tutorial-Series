@@ -16,12 +16,13 @@ public:
 	bool kick(sf::Vector2f enemy_pos, std::string enemy_state);
 	void block();
 	void release_state(sf::Vector2f enemy_pos);
+	void prespec(sf::Vector2f enemy_pos);
 	virtual special_attack* special(sf::Vector2f enemy_pos);
 
 	//accessing privates
 	std::string get_state();
 	sf::Vector2f get_pos();
-	bool take_damage(int damage);
+	bool take_damage(int damage, sf::Vector2f enemy_pos);
 
 	//drawing utility
 	sf::Sprite get_Sprite();
@@ -35,8 +36,8 @@ protected:
 	sf::String name;
 	health_bar health;
 	std::vector <sf::Image> states;
-
-
+	float kick_offset;
+	float punch_offset;
 };
 
 //SPECIALIZED CHARACTERS

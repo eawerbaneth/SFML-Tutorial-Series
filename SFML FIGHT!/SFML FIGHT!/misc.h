@@ -1,6 +1,7 @@
 //health_bar.h
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <iostream>
 
 class health_bar{
 public:
@@ -50,6 +51,7 @@ public:
 private:
 	sf::Sprite image;
 	std::vector <sf::Vector2f> path;
+	sf::Vector2f old_pos;
 	void generate_parabola(sf::Vector2f enemy_pos, bool dir);
 	bool advance(float ElapsedTime);
 };

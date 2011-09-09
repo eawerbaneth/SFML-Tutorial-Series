@@ -67,12 +67,11 @@ std::string player::get_state(){
 bool player::punch(sf::Vector2f enemy_pos, std::string enemy_state){
 	//change basic stuff
 	state="PUNCH";
-	//Sprite.SetColor(sf::Color::Magenta);
-	//Sprite.Resize(Sprite.GetSize().x+50, Sprite.GetSize().y);
-	Sprite.SetImage(states[2]);
+	Sprite = sf::Sprite(states[2], Sprite.GetPosition());
 	//if we're facing left, we need to adjust for that
 	if(enemy_pos.x+100<Sprite.GetPosition().x+Sprite.GetSize().x){
-		Sprite.SetPosition(Sprite.GetPosition().x-50, Sprite.GetPosition().y);
+		Sprite.FlipX(true);
+		Sprite.SetPosition(Sprite.GetPosition().x-punch_offset, Sprite.GetPosition().y);
 	}
 	//check for collision and acceptable enemy state
 	if(enemy_pos.x>=Sprite.GetPosition().x && 
@@ -90,11 +89,10 @@ bool player::punch(sf::Vector2f enemy_pos, std::string enemy_state){
 
 bool player::kick(sf::Vector2f enemy_pos, std::string enemy_state){
 	state="KICK";
-	//Sprite.SetColor(sf::Color::Green);
 	Sprite = sf::Sprite(states[3], Sprite.GetPosition());
 	//adjust for which way we're facing
 	if(enemy_pos.x+100<Sprite.GetPosition().x+Sprite.GetSize().x){
-		Sprite.SetPosition(Sprite.GetPosition().x-100, Sprite.GetPosition().y);
+		Sprite.SetPosition(Sprite.GetPosition().x-kick_offset, Sprite.GetPosition().y);
 		Sprite.FlipX(true);
 	}
 	//check for collision and acceptable enemy state
@@ -115,26 +113,30 @@ bool player::kick(sf::Vector2f enemy_pos, std::string enemy_state){
 void player::block(){
 	state="BLOCK";
 	Sprite.SetImage(states[1]);
-	//Sprite.SetColor(sf::Color::Yellow);
+}
+
+void player::prespec(sf::Vector2f enemy_pos){
+	Sprite = sf::Sprite(states[4], Sprite.GetPosition());
+	if(enemy_pos.x<Sprite.GetPosition().x)
+		Sprite.FlipX(true);
+	state="SPECIAL";
 }
 
 void player::release_state(sf::Vector2f enemy_pos){
-	//Sprite.Resize(100, 200);
-	if((std::string)name.GetText()=="player1"||(std::string)name.GetText()=="BETH")
-		Sprite.SetImage(states[0]);//Sprite.SetColor(sf::Color::Red);
-	else
-		Sprite.SetColor(sf::Color::Blue);
+	Sprite = sf::Sprite(states[0], Sprite.GetPosition());
 	//reset position if we adjusted it
 	if(enemy_pos.x<Sprite.GetPosition().x){
+		Sprite.FlipX(true);
 		if(state=="KICK")
-			Sprite.SetPosition(Sprite.GetPosition().x+100, Sprite.GetPosition().y);
+			Sprite.SetPosition(Sprite.GetPosition().x+kick_offset, Sprite.GetPosition().y);
 		if(state=="PUNCH")
-			Sprite.SetPosition(Sprite.GetPosition().x+50, Sprite.GetPosition().y);
+			Sprite.SetPosition(Sprite.GetPosition().x+punch_offset, Sprite.GetPosition().y);
 	}
 	state="NULL";
 }
 
-bool player::take_damage(int damage){
+bool player::take_damage(int damage, sf::Vector2f enemy_pos){
+	release_state(enemy_pos);
 	if(health.take_damage(damage)){
 		destroy();
 		return true;

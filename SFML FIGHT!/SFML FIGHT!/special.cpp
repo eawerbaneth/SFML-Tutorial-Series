@@ -43,15 +43,20 @@ FIGHTBETH::FIGHTBETH(std::string pos){
 	}	
 	state="NULL";
 
+	kick_offset = (float)states[3].GetWidth()-states[0].GetWidth();
+	punch_offset = (float)states[2].GetWidth()-states[0].GetWidth();
+
 }
 
 blast* FIGHTBETH::special(sf::Vector2f enemy_pos){
 	//Sprite.SetColor(sf::Color::White);
-	state="SPECIAL";
+	Sprite.SetImage(states[5]);
 	if(Sprite.GetPosition().x<enemy_pos.x)
-		return new blast(Sprite.GetPosition(), true);
+		return new blast(sf::Vector2f(Sprite.GetPosition().x+Sprite.GetSize().x, 
+			Sprite.GetPosition().y+(Sprite.GetSize().y/2)), true);
 	else
-		return new blast(Sprite.GetPosition(), false);
+		return new blast(sf::Vector2f(Sprite.GetPosition().x, 
+			Sprite.GetPosition().y+Sprite.GetSize().y/2), false);
 }
 
 FIGHTDAN::FIGHTDAN(){}
@@ -87,9 +92,15 @@ FIGHTDAN::FIGHTDAN(std::string pos){
 		health.set_pos(800.f);
 	}	
 	state="NULL";
+
+	kick_offset = (float)states[3].GetWidth()-states[0].GetWidth();
+	punch_offset = (float)states[2].GetWidth()-states[0].GetWidth();
 }
 
 hawk *FIGHTDAN::special(sf::Vector2f enemy_pos){
 	state="SPECIAL";
+	Sprite = sf::Sprite(states[5], Sprite.GetPosition());
+	if(enemy_pos.x<Sprite.GetPosition().x)
+		Sprite.FlipX(true);
 	return new hawk(Sprite.GetPosition(), enemy_pos);
 }

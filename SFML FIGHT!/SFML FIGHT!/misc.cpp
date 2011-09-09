@@ -1,6 +1,8 @@
 #include "misc.h"
 #include <cmath>
 
+const float PI = 3.14159265;
+
 health_bar::health_bar(){
 	health=100;
 	bar.Resize(400, 50);
@@ -172,10 +174,8 @@ float get_dist(sf::Vector2f p1, sf::Vector2f p2){
 }
 
 float get_angle(sf::Vector2f p1, sf::Vector2f p2){
-	return -atan((p1.y-p2.y)/(p1.x-p2.x));
+	return atan2((p1.y-p2.y), (p1.x-p2.x));
 }
-
-
 
 bool hawk::advance(float ElapsedTime){
 	//ElapsedTime = 1;
@@ -185,11 +185,17 @@ bool hawk::advance(float ElapsedTime){
 	else{
 		//determine angle we want to move to
 		float angle=get_angle(image.GetPosition(), path[0]);
+		std::cout << "\tAngle: " << angle*180/PI << "\n";
 		//move as far as we can this frame
-		image.Move(100*-sin(angle)*ElapsedTime, 100*cos(angle)*ElapsedTime);
+		old_pos = image.GetPosition();
+		image.Move(100*sin(angle)*ElapsedTime, 100*cos(angle)*ElapsedTime);
 		//if we're close enough, clear the checkpoint
-		if(get_dist(image.GetPosition(), path[0])<30)
+		if(get_dist(image.GetPosition(), path[0])>get_dist(old_pos, path[0])){
+			std::cout << "Passed checkpoint (" << image.GetPosition().x << ", "<< image.GetPosition().y << ")\t\n"
+				<< "path[0]: (" << path[0].x << ", " << path[0].y << "\n";
 			path.erase(path.begin());
+			
+		}
 	}
 	return true;
 }

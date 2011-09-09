@@ -1,7 +1,7 @@
-#include <iostream>
 #include <sstream>
 #include "player.h"
 #include <fstream>
+#include <time.h>
 
 int main(){
 
@@ -13,7 +13,7 @@ int main(){
 	player* player_1=new FIGHTBETH("player1");
 	player* player_2=new FIGHTDAN("player2");
 
-
+	//initialize game utilities
 	bool p1lock=false, p2lock=false;
 	bool p1_block=false, p2_block=false;
 	bool p1_special=false, p2_special=false;
@@ -22,7 +22,6 @@ int main(){
 	bool game_over=false;
 	special_attack* p1spec;
 	special_attack* p2spec;
-
 
 	/*
 	//countdown!
@@ -69,23 +68,22 @@ int main(){
 				player_1->adjust(150*ElapsedTime, 0, player_2->get_pos());
 			//punch
 			if(App.GetInput().IsKeyDown(sf::Key::G)){
-				if(player_1->punch(player_2->get_pos(), player_2->get_state()))
-					game_over=player_2->take_damage(10);
+				if(player_1->punch(player_2->get_pos(), player_2->get_state())){
+					game_over=player_2->take_damage(10, player_1->get_pos());
+				}
 				p1lock=true;
 				p1Clock.Reset();
 			}
 			//kick
 			else if(App.GetInput().IsKeyDown(sf::Key::V)){
 				if(player_1->kick(player_2->get_pos(), player_2->get_state()))
-					game_over=player_2->take_damage(25);
+					game_over=player_2->take_damage(25, player_1->get_pos());
 				p1lock=true;
 				p1Clock.Reset();
 			}
 			//special
 			else if(App.GetInput().IsKeyDown(sf::Key::B)){
-				p1_special=true;
-				//if we are to the left of the enemy
-				p1spec=player_1->special(player_2->get_pos());
+				player_1->prespec(player_2->get_pos());
 				p1lock=true;
 				p1Clock.Reset();
 			}
@@ -97,15 +95,22 @@ int main(){
 		}
 		//handle unlocking the player
 		else{
-			if(player_1->get_state()=="KICK"&&p1Clock.GetElapsedTime()>=0.5){
+			if(player_1->get_state()=="NULL")
+				p1lock=false;
+			else if(player_1->get_state()=="KICK"&&p1Clock.GetElapsedTime()>=.75){
 				player_1->release_state(player_2->get_pos());
 				p1lock=false;
 			}
-			else if(player_1->get_state()=="PUNCH"&&p1Clock.GetElapsedTime()>=0.25){
+			else if(player_1->get_state()=="PUNCH"&&p1Clock.GetElapsedTime()>=0.5){
 				player_1->release_state(player_2->get_pos());
 				p1lock=false;
 			}
-			else if(player_1->get_state()=="SPECIAL"&&p1Clock.GetElapsedTime()>=1){
+			else if(player_1->get_state()=="SPECIAL"&&p1Clock.GetElapsedTime()>=1.5
+						&&p1Clock.GetElapsedTime()<2){
+				p1spec=player_1->special(player_2->get_pos());
+				p1_special=true; 
+			}
+			else if(player_1->get_state()=="SPECIAL"&&p1Clock.GetElapsedTime()>=2){
 				player_1->release_state(player_2->get_pos());
 				p1lock=false;
 			}
@@ -128,22 +133,20 @@ int main(){
 			//punch
 			if(App.GetInput().IsKeyDown(sf::Key::SemiColon)){
 				if(player_2->punch(player_1->get_pos(), player_1->get_state()))
-					game_over=player_1->take_damage(10);
+					game_over=player_1->take_damage(10, player_2->get_pos());
 				p2lock=true;
 				p2Clock.Reset();
 			}
 			//kick
 			else if(App.GetInput().IsKeyDown(sf::Key::Period)){
 				if(player_2->kick(player_1->get_pos(), player_1->get_state()))
-					game_over=player_1->take_damage(25);
+					game_over=player_1->take_damage(25, player_2->get_pos());
 				p2lock=true;
 				p2Clock.Reset();
 			}
 			//special
 			else if(App.GetInput().IsKeyDown(sf::Key::Slash)){
-				p2_special=true;
-				//testing
-				p2spec=player_2->special(player_1->get_pos());
+				player_2->prespec(player_1->get_pos());
 				p2lock=true;
 				p2Clock.Reset();
 			}
@@ -154,7 +157,9 @@ int main(){
 			}
 		}
 		else{
-			if(player_2->get_state()=="KICK"&&p2Clock.GetElapsedTime()>=0.5){
+			if(player_2->get_state()=="NULL")
+				p2lock=false;
+			else if(player_2->get_state()=="KICK"&&p2Clock.GetElapsedTime()>=0.5){
 				player_2->release_state(player_1->get_pos());
 				p2lock=false;
 			}
@@ -162,7 +167,12 @@ int main(){
 				player_2->release_state(player_1->get_pos());
 				p2lock=false;
 			}
-			else if(player_2->get_state()=="SPECIAL"&&p2Clock.GetElapsedTime()>=1){
+			else if(player_2->get_state()=="SPECIAL"&&p2Clock.GetElapsedTime()>=1.5
+					&&p2Clock.GetElapsedTime()<2){
+				p2spec=player_2->special(player_1->get_pos());
+				p2_special=true; 
+			}
+			else if(player_2->get_state()=="SPECIAL"&&p2Clock.GetElapsedTime()>=2){
 				player_2->release_state(player_1->get_pos());
 				p2lock=false;
 			}
@@ -193,7 +203,7 @@ int main(){
 			App.Draw(p1spec->get_image(ElapsedTime, p1_special));
 			if(p1spec->collides(player_2->get_pos(), player_2->get_Sprite().GetSize(), 
 				player_2->get_state())){
-					game_over=player_2->take_damage(40);
+					game_over=player_2->take_damage(40, player_2->get_pos());
 					p1_special=false;
 			}
 		}
@@ -201,7 +211,7 @@ int main(){
 			App.Draw(p2spec->get_image(ElapsedTime, p2_special));
 			if(p2spec->collides(player_1->get_pos(), player_1->get_Sprite().GetSize(), 
 				player_1->get_state())){
-					game_over=player_1->take_damage(40);
+					game_over=player_1->take_damage(40, player_2->get_pos());
 					p2_special=false;
 			}
 		}
