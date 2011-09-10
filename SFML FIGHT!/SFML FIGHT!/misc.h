@@ -3,6 +3,8 @@
 #include <string>
 #include <iostream>
 
+const float PI = 3.14159265;
+
 class health_bar{
 public:
 	health_bar();

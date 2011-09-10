@@ -1,7 +1,6 @@
 #include "misc.h"
 #include <cmath>
 
-const float PI = 3.14159265;
 
 health_bar::health_bar(){
 	health=100;
@@ -189,7 +188,8 @@ bool hawk::advance(float ElapsedTime){
 		//determine angle we want to move to
 		float angle=get_angle(image.GetPosition(), path[0]);
 		//move as far as we can this frame
-		image.Move(200*cos(angle)*ElapsedTime, 200*sin(angle)*ElapsedTime);
+		old_pos= image.GetPosition();
+		image.Move(300*cos(angle)*ElapsedTime, 300*sin(angle)*ElapsedTime);
 		//if we're close enough, clear the checkpoint
 		if(get_dist(image.GetPosition(), path[0])>get_dist(old_pos, path[0]))
 			path.erase(path.begin());

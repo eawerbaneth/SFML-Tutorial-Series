@@ -1,2 +1,7 @@
-﻿  misc.cpp
+﻿  special.cpp
+  player.cpp
+  misc.cpp
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.cpp(4): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+  main.cpp
+  Generating Code...
   SFML FIGHT!.vcxproj -> C:\Users\Ryan Tarte\SFML-Tutorial-Series\SFML FIGHT!\Debug\SFML FIGHT!.exe

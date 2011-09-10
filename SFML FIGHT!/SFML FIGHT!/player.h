@@ -23,6 +23,7 @@ public:
 	std::string get_state();
 	sf::Vector2f get_pos();
 	bool take_damage(int damage, sf::Vector2f enemy_pos);
+	bool alive();
 
 	//drawing utility
 	sf::Sprite get_Sprite();

@@ -155,4 +155,3 @@ sf::String player::get_name(){
 special_attack* player::special(sf::Vector2f enemy_pos){
 	return NULL;
 }
-
