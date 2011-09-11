@@ -1,0 +1,13 @@
+﻿  main.cpp
+main.cpp(13): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+main.cpp(826): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(826): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(830): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(830): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(834): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(834): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(845): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  Finished generating code
+  sfml-test2.vcxproj -> C:\SFML-1.6\lib\sfml-test2\Release\sfml-test2.exe

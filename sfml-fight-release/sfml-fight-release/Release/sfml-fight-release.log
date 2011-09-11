@@ -1,0 +1,13 @@
+﻿  main.cpp
+c:\users\ryan tarte\sfml-tutorial-series\sfml-fight-release\sfml-fight-release\misc.h(6): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+main.cpp(245): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(245): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(249): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(249): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(253): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(253): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+main.cpp(264): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+LINK : warning LNK4098: defaultlib 'LIBCMT' conflicts with use of other libs; use /NODEFAULTLIB:library
+  Generating code
+  Finished generating code
+  sfml-fight-release.vcxproj -> C:\Users\Ryan Tarte\SFML-Tutorial-Series\sfml-fight-release\Release\sfml-fight-release.exe
