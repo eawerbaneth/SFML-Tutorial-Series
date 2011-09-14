@@ -1,2 +1,6 @@
 ﻿  main.cpp
+c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(48): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(48): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(73): warning C4244: 'initializing' : conversion from 'const float' to 'unsigned int', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(77): warning C4244: 'initializing' : conversion from 'const float' to 'unsigned int', possible loss of data
   god-of-fire.vcxproj -> C:\Users\Ryan Tarte\SFML-Tutorial-Series\god-of-fire\Debug\god-of-fire.exe
