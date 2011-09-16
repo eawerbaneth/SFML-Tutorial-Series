@@ -5,6 +5,7 @@
 #include "tile.h"
 
 sf::Image tileset;
+sf::Image monk_sprites;
 
 //return true if exit command received
 bool handle_events(sf::RenderWindow &screen, sf::View &View);
@@ -12,9 +13,19 @@ void keyboard_input(sf::RenderWindow &screen, sf::View &View);
 void police_boundaries(sf::View &View, sf::Vector2i &mapsize);
 bool readmap(std::vector <std::vector<tile*>> &map);
 void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &map);
-void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map);
-void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View);
-void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
+void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
+void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, std::vector <monk*> &monks);
+//void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
+void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
+
+bool compare_function( monk* &a,  monk* &b){
+	if(a->get_pos().y < b->get_pos().y)
+		return true;
+	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
+		return true;
+	else
+		return false;
+}
 
 int main(){
 	//initalize the game window
@@ -26,6 +37,7 @@ int main(){
 	sf::Vector2f mouse_coords;
 	std::vector <std::vector <tile*>> map;
 	std::vector <monk*> monks;
+	int frames=0;
 	//if we failed to load our map, exit program
 	if(!readmap(map))
 		return 0;
@@ -35,6 +47,8 @@ int main(){
 	
 	sf::View View=screen.GetDefaultView();
 	while(screen.IsOpened()){
+
+		frames++;
 
 		if(handle_events(screen, View))
 			screen.Close();
@@ -53,12 +67,15 @@ int main(){
 		//maintain boundaries
 		police_boundaries(View, mapsize);
 
+		if(frames%15==0)
+			monk_update(map, monks);
+
 		//display
 		screen.Clear();
 		screen.SetView(View);	
-		//printmap(screen, map);
-		printmapdynamic(screen, map, View);
-		printmonks(screen, monks);
+		//printmap(screen, map, monks);
+		printmapdynamic(screen, map, View, monks);
+		//printmonks(screen, monks);
 		screen.SetView(screen.GetDefaultView());
 		screen.Display();
 
@@ -67,9 +84,44 @@ int main(){
 	return 0;
 }
 
+
+void rand_dest(int &x, int &y, std::vector <std::vector <tile*>> &map){
+	x = sf::Randomizer().Random(2, map.size()-3);
+	y = sf::Randomizer().Random(2, map.size()-3);
+	//get a random destination
+	while(map[x][y]->get_type()!=' '){
+		x = sf::Randomizer().Random(2, map.size()-3);
+		y = sf::Randomizer().Random(2, map.size()-3);
+	}
+}
+
+//update monk behavior
+void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks){
+	//give each monk a chance to update himself
+	for(int i=0; i<monks.size(); i++){
+		//check to see if we're already at our destination
+		if(monks[i]->dest_reached()){
+			int x, y;
+			rand_dest(x, y, map);
+			monks[i]->set_dest(sf::Vector2i(x, y));
+		}
+		else{ //we haven't reached destination yet
+			sf::Vector2i dest = monks[i]->update();
+			//if we can't move, set a new destination
+			if(!monks[i]->request_occupy(map[dest.x][dest.y])){
+				int x, y;
+				rand_dest(x, y, map);
+				monks[i]->set_dest(sf::Vector2i(x, y));
+			}
+		}	
+	}
+
+}
+
 //print map dynamically
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, 
-	sf::View &View){
+	sf::View &View, std::vector <monk*> &monks){
+	unsigned int mnk = 0;
 	unsigned int row = (View.GetRect().Top)/dim;
 	if(row<0) row=0;
 
@@ -78,36 +130,59 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 		if(col<0) col=0;
 		for(col; (col<map[row].size()&&col<View.GetRect().Right); col++)
 			screen.Draw(map[row][col]->get_sprite());
+		//finished the row, time to draw the monks
+		while(mnk < monks.size() && monks[mnk]->get_tile().x <=row){
+			if(monks[mnk]->get_tile().x == row)
+				screen.Draw(monks[mnk]->get_sprite());
+			mnk++;
+		}
 	}
 
 }
 
 //print entire map
-void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map){
-	for(unsigned int i=0; i<map.size(); i++)
+void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks){
+	int mnk = 0;
+
+	for(unsigned int i=0; i<map.size(); i++){
 		for(unsigned int k=0; k<map[i].size(); k++){
 			screen.Draw(map[i][k]->get_sprite());
-			//screen.Display();
 		}
+		//we've finished a row, now draw monks for that row
+		while(mnk<monks.size() && monks[mnk]->get_tile().x <= i){
+			screen.Draw(monks[mnk]->get_sprite());
+			mnk++;
+		}
+	}
 }
 
-
-
+/*
 void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks){
 	for(unsigned int i=0; i<monks.size(); i++)
 		screen.Draw(monks[i]->get_sprite());
 }
+*/
 
 void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &map){
 	int num_monks = map.size()*map[0].size()/20;
-	sf::Image monk_sprites;
-	monk_sprites.LoadFromFile("imgs/monks.png");
+	if(!monk_sprites.LoadFromFile("imgs/monks.png"))
+		return;
 
 	for(int i=0; i<num_monks; i++){
-		int randx = sf::Randomizer().Random(0, map.size()-1);
-		int randy = sf::Randomizer().Random(0, map[0].size()-1);
-		monks.push_back(new monk(map[randx][randy], 0, &monk_sprites));
+		int randx = sf::Randomizer().Random(2, map.size()-3);
+		int randy = sf::Randomizer().Random(2, map[0].size()-3);
+		if(map[randx][randy]->get_type()==' ' && !map[randx][randy]->is_occupied()){
+			int randx2;
+			int randy2;
+			//get a random destination
+			rand_dest(randx2, randy2, map);
+			monks.push_back(new monk(map[randx][randy], 0, &monk_sprites, map[randx2][randy2]));
+		}
+		else
+			i--;
 	}
+	
+	sort(monks.begin(), monks.end(), compare_function);
 
 }
 
@@ -119,7 +194,7 @@ bool readmap(std::vector <std::vector <tile*>> &map){
 	if(!tileset.LoadFromFile("imgs/modtiles2.png"))
 		return false;
 
-	input.open("maps/proxymap.txt");
+	input.open("maps/proxy2.txt");
 	if(!input.is_open())
 		return false;
 

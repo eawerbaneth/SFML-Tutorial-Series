@@ -2,6 +2,8 @@
 #include <SFML\Graphics.hpp>
 #include <string>
 #include <iostream>
+#include <algorithm>
+#include <iomanip>
 
 const int dim = 100;
 const int citizen_dim = 75;
@@ -15,29 +17,46 @@ public:
 	char get_type(){return type;}
 	sf::Vector2f get_pos(){return Sprite.GetPosition();}
 	sf::Sprite get_sprite(){return Sprite;}
+	sf::IntRect get_rect(){return Sprite.GetSubRect();}
+	sf::Vector2i get_coords(){return coords;}
+	bool is_occupied(){return occupied;}
+
+	bool occupy();
 
 
 private:
+	bool occupied;
 	float z;
 	char type;
 	sf::Sprite Sprite;
 	bool corrupted;
+	sf::Vector2i coords;
 
 };
 
 class monk{
 public:
 	monk(){}
-	monk(tile* tile, int Type, sf::Image *Image);
+	monk(tile* my_tile, int Type, sf::Image *Image, tile* destination);
 
 	//accessing privates
 	int get_type(){return type;}
 	sf::Vector2f get_pos(){return Sprite.GetPosition();}
 	sf::Sprite get_sprite(){return Sprite;}
+	sf::IntRect get_rect(){return Sprite.GetSubRect();}
+	sf::Vector2i get_tile(){return tilecoords;}
+
+	bool request_occupy(tile* new_tile);
+	sf::Vector2i update();
+	void set_dest(sf::Vector2i newcoords){destcoords = newcoords;}
+	bool dest_reached(){return tilecoords==destcoords;}
 
 
 protected:
 	int type;
 	sf::Sprite Sprite;
+	sf::Vector2i tilecoords;
+	sf::Vector2i destcoords;
 
 };
+
