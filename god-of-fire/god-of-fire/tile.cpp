@@ -52,16 +52,16 @@ monk::monk(tile* my_tile, int Type, sf::Image *Image, tile* destination){
 
 //try to move onto a new tile
 bool monk::request_occupy(tile* new_tile){
-	if(new_tile->occupy()){
+	//if(new_tile->occupy()){
 		Sprite.SetPosition(new_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
 			new_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
 		tilecoords = new_tile->get_coords();
 		if(!path.empty())
 			path.pop_back();
 		return true;
-	}
-	else
-		return false;
+	//}
+	//else
+	//	return false;
 }
 
 sf::Vector2i monk::update(){

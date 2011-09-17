@@ -21,7 +21,6 @@ public:
 	sf::IntRect get_rect(){return Sprite.GetSubRect();}
 	sf::Vector2i get_coords(){return coords;}
 	bool is_occupied(){return occupied;}
-
 	bool occupy();
 
 
@@ -54,13 +53,24 @@ public:
 	bool dest_reached(){return tilecoords==destcoords;}
 	void set_path(std::vector <sf::Vector2i> new_path){path = new_path;}
 
-
 protected:
 	int type;
 	sf::Sprite Sprite;
 	sf::Vector2i tilecoords;
 	sf::Vector2i destcoords;
 	std::vector <sf::Vector2i> path;
+
+};
+
+class faithful: public monk{
+public:
+
+
+};
+
+class corrupted: public monk{
+public:
+
 
 };
 

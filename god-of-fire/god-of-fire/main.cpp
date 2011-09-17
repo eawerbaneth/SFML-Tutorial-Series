@@ -1,7 +1,6 @@
 //main.cpp
 #include <fstream>
-#include "pathing.h"
-
+#include "tile.h"
 
 sf::Image tileset;
 sf::Image monk_sprites;
@@ -26,7 +25,7 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 //void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
 //updates
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
-void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
+bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
 bool compare_function( monk* &a,  monk* &b);
 bool helpersort(path_helper* &a, path_helper* &b);
 
@@ -103,11 +102,16 @@ void rand_dest(int &x, int &y, std::vector <std::vector <tile*>> &map){
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks){
 	//give each monk a chance to update himself
 	for(unsigned int i=0; i<monks.size(); i++){
-		//check to see if we're already at our destination
+		//if we've reached our destination, find a new one
 		if(monks[i]->dest_reached()){
-			int x, y;
-			rand_dest(x, y, map);
-			monks[i]->set_dest(sf::Vector2i(x, y));
+			bool lock = true;
+			while(lock){
+				int x, y;
+				rand_dest(x, y, map);
+				monks[i]->set_dest(sf::Vector2i(x, y));
+				if(find_path(map, monks[i]))
+					lock = false;
+			}	
 		}
 		else{ //we haven't reached destination yet
 			sf::Vector2i dest = monks[i]->update();
@@ -115,6 +119,7 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			monks[i]->request_occupy(map[dest.x][dest.y]);
 		}	
 	}
+	sort(monks.begin(), monks.end(), compare_function);
 }
 
 //print map dynamically
@@ -155,32 +160,32 @@ void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, 
 	}
 }
 
-/*
-void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks){
-	for(unsigned int i=0; i<monks.size(); i++)
-		screen.Draw(monks[i]->get_sprite());
-}
-*/
-
 void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &map){
-	int num_monks = map.size()*map[0].size()/20;
+	int num_monks = map.size()*map[0].size()/25;
 	if(!monk_sprites.LoadFromFile("imgs/monks.png"))
 		return;
 
+	//for each monk
 	for(int i=0; i<num_monks; i++){
+		//generate a random tile to start on
 		int randx = sf::Randomizer().Random(2, map.size()-3);
 		int randy = sf::Randomizer().Random(2, map[0].size()-3);
+		//if that tile is open, make the monk
 		if(map[randx][randy]->get_type()==' ' && !map[randx][randy]->is_occupied()){
-			int randx2;
-			int randy2;
-			//get a random destination
-			rand_dest(randx2, randy2, map);
-			monks.push_back(new monk(map[randx][randy], 0, &monk_sprites, map[randx2][randy2]));
-			//go ahead and do pathing
-			find_path(map, monks[monks.size()-1]);
+			monks.push_back(new monk(map[randx][randy], 0, &monk_sprites, map[0][0]));
+			//deal with pathing
+			bool lock = true;
+			while(lock){
+				int randx2;
+				int randy2;
+				rand_dest(randx2, randy2, map);
+				monks[i]->set_dest(sf::Vector2i(randx2, randy2));
+				if(find_path(map, monks[i]))
+					lock=false;
+			}
 		}
-		else
-			i--;
+		//our tile wasn't available, start over
+		else i--;
 	}
 	
 	sort(monks.begin(), monks.end(), compare_function);
@@ -270,11 +275,7 @@ bool handle_events(sf::RenderWindow &screen, sf::View &View){
 }
 
 //find a monk's path to his destination (Dijkstra's Algorithm)
-void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
-	sf::Clock timer;
-	timer.Reset();
-
-	std::cout << "Starting monk pathing...\n";
+bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
 
 	sf::Vector2i dest = a_monk->get_dest();
 	sf::Vector2i current = a_monk->get_tile();
@@ -296,15 +297,9 @@ void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
 		}
 	}
 
-	std::cout << "\t Pre-Dijkstra time: " << timer.GetElapsedTime() << "\n";
-
-	//std::vector <path_helper> helper;
-
 	path_helper* u;
-	int iteration = 0;
 
 	while(!helper.empty()){
-		iteration++;
 		std::sort(helper.begin(), helper.end(), helpersort);
 		u = helper[0];
 		if(u->dist == 10000)
@@ -337,8 +332,6 @@ void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
 				}
 			}
 		}
-		if(iteration%10==0)
-			std::cout << "\tIteration " << iteration << ": " << timer.GetElapsedTime() << "\n";
 	}
 
 	std::vector <sf::Vector2i> path;
@@ -348,12 +341,12 @@ void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
 			path.push_back(u->prev->pos);
 			u=u->prev;
 		}
+		a_monk->set_path(path);
+		return true;
 	}
+	else
+		return false;
 
-	a_monk->set_path(path);
-	helper.clear();
-
-	std::cout << "Pathing time: " << timer.GetElapsedTime() << "\n";
 }
 
 bool compare_function( monk* &a,  monk* &b){
