@@ -56,32 +56,17 @@ bool monk::request_occupy(tile* new_tile){
 		Sprite.SetPosition(new_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
 			new_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
 		tilecoords = new_tile->get_coords();
+		if(!path.empty())
+			path.pop_back();
 		return true;
 	}
 	else
 		return false;
-
 }
 
 sf::Vector2i monk::update(){
-	sf::Vector2i step = tilecoords;
-
-	//if we're on an even row (row below us shifts to left)
-	if(step.x%2==0)
-		//our dest is to the right
-		if(destcoords.x > step.x)
-			step.x++;
-	//we're on an odd row(row below us shifts to right)
+	if(!path.empty())
+		return path[path.size()-1];
 	else
-		//our dest is to the left
-		if(destcoords.x < step.x)
-			step.x--;
-	//our dest is above us
-	if(destcoords.y < step.y)
-		step.y--;
-	else
-		step.y++;
-
-	return step;
-
+		return destcoords;
 }

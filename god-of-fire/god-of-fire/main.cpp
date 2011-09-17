@@ -1,31 +1,35 @@
 //main.cpp
-
-#include <vector>
 #include <fstream>
-#include "tile.h"
+#include "pathing.h"
+
 
 sf::Image tileset;
 sf::Image monk_sprites;
 
-//return true if exit command received
+struct path_helper{
+	int dist;
+	path_helper* prev;
+	sf::Vector2i pos;
+};
+
+//input utilities
 bool handle_events(sf::RenderWindow &screen, sf::View &View);
 void keyboard_input(sf::RenderWindow &screen, sf::View &View);
 void police_boundaries(sf::View &View, sf::Vector2i &mapsize);
+//game initializations
 bool readmap(std::vector <std::vector<tile*>> &map);
 void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &map);
+
+//drawing utilties
 void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, std::vector <monk*> &monks);
 //void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
+//updates
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
+void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
+bool compare_function( monk* &a,  monk* &b);
+bool helpersort(path_helper* &a, path_helper* &b);
 
-bool compare_function( monk* &a,  monk* &b){
-	if(a->get_pos().y < b->get_pos().y)
-		return true;
-	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
-		return true;
-	else
-		return false;
-}
 
 int main(){
 	//initalize the game window
@@ -58,8 +62,8 @@ int main(){
 		mouse_coords = screen.ConvertCoords(screen.GetInput().GetMouseX(), 
 			screen.GetInput().GetMouseY());
 		if(screen.GetInput().IsMouseButtonDown(sf::Mouse::Left))
-			View.Move(-1.5*(mouse_coords.x-old_mouse_coords.x), 
-			-1.5*(mouse_coords.y-old_mouse_coords.y));
+			View.Move(-1.5f*(mouse_coords.x-old_mouse_coords.x), 
+			-1.5f*(mouse_coords.y-old_mouse_coords.y));
 
 		//keyboard control
 		keyboard_input(screen, View);
@@ -98,7 +102,7 @@ void rand_dest(int &x, int &y, std::vector <std::vector <tile*>> &map){
 //update monk behavior
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks){
 	//give each monk a chance to update himself
-	for(int i=0; i<monks.size(); i++){
+	for(unsigned int i=0; i<monks.size(); i++){
 		//check to see if we're already at our destination
 		if(monks[i]->dest_reached()){
 			int x, y;
@@ -107,31 +111,26 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 		}
 		else{ //we haven't reached destination yet
 			sf::Vector2i dest = monks[i]->update();
-			//if we can't move, set a new destination
-			if(!monks[i]->request_occupy(map[dest.x][dest.y])){
-				int x, y;
-				rand_dest(x, y, map);
-				monks[i]->set_dest(sf::Vector2i(x, y));
-			}
+			//move if we can, if we can't: do nothing
+			monks[i]->request_occupy(map[dest.x][dest.y]);
 		}	
 	}
-
 }
 
 //print map dynamically
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, 
 	sf::View &View, std::vector <monk*> &monks){
 	unsigned int mnk = 0;
-	unsigned int row = (View.GetRect().Top)/dim;
+	unsigned int row = (unsigned)(View.GetRect().Top)/dim;
 	if(row<0) row=0;
 
 	for(row; (row<map.size()&&row<(View.GetRect().Bottom+dim)/(dim/4)); row++){
-		unsigned int col = (View.GetRect().Left)/dim;
+		unsigned int col = (unsigned)(View.GetRect().Left)/dim;
 		if(col<0) col=0;
 		for(col; (col<map[row].size()&&col<View.GetRect().Right); col++)
 			screen.Draw(map[row][col]->get_sprite());
 		//finished the row, time to draw the monks
-		while(mnk < monks.size() && monks[mnk]->get_tile().x <=row){
+		while(mnk < monks.size() && (unsigned)monks[mnk]->get_tile().x <=row){
 			if(monks[mnk]->get_tile().x == row)
 				screen.Draw(monks[mnk]->get_sprite());
 			mnk++;
@@ -142,14 +141,14 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 
 //print entire map
 void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks){
-	int mnk = 0;
+	unsigned int mnk = 0;
 
 	for(unsigned int i=0; i<map.size(); i++){
 		for(unsigned int k=0; k<map[i].size(); k++){
 			screen.Draw(map[i][k]->get_sprite());
 		}
 		//we've finished a row, now draw monks for that row
-		while(mnk<monks.size() && monks[mnk]->get_tile().x <= i){
+		while(mnk<monks.size() && (unsigned)monks[mnk]->get_tile().x <= i){
 			screen.Draw(monks[mnk]->get_sprite());
 			mnk++;
 		}
@@ -177,6 +176,8 @@ void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &ma
 			//get a random destination
 			rand_dest(randx2, randy2, map);
 			monks.push_back(new monk(map[randx][randy], 0, &monk_sprites, map[randx2][randy2]));
+			//go ahead and do pathing
+			find_path(map, monks[monks.size()-1]);
 		}
 		else
 			i--;
@@ -267,3 +268,104 @@ bool handle_events(sf::RenderWindow &screen, sf::View &View){
 	return false;
 
 }
+
+//find a monk's path to his destination (Dijkstra's Algorithm)
+void find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
+	sf::Clock timer;
+	timer.Reset();
+
+	std::cout << "Starting monk pathing...\n";
+
+	sf::Vector2i dest = a_monk->get_dest();
+	sf::Vector2i current = a_monk->get_tile();
+
+	std::vector <path_helper*> helper;
+
+	for(unsigned int i=2; i<map.size()-2; i++){
+		for(unsigned int k=2; k<map[i].size()-2; k++){
+			if(map[i][k]->get_type() == ' '){
+				path_helper* temp = new path_helper;
+				temp->pos = sf::Vector2i(i, k);
+				if(temp->pos == current)
+					temp->dist = 0;
+				else
+					temp->dist = 10000;
+				temp->prev = NULL;
+				helper.push_back(temp);
+			}
+		}
+	}
+
+	std::cout << "\t Pre-Dijkstra time: " << timer.GetElapsedTime() << "\n";
+
+	//std::vector <path_helper> helper;
+
+	path_helper* u;
+	int iteration = 0;
+
+	while(!helper.empty()){
+		iteration++;
+		std::sort(helper.begin(), helper.end(), helpersort);
+		u = helper[0];
+		if(u->dist == 10000)
+			break; //all remaining vertices inaccessible for source
+		if(u->pos == dest)
+			break;
+		helper.erase(helper.begin());
+		for(unsigned int j=0; j<helper.size(); j++){
+			//if the node is on an adjacent row
+			if(helper[j]->pos.x == u->pos.x-1 || helper[j]->pos.x == u->pos.x+1){
+				if(u->pos.x%2==0){//if our u is even, look at the col and col+1 on either side
+					if(helper[j]->pos.y == u->pos.y || helper[j]->pos.y == u->pos.y+1){
+						//we are adjacent!
+						int new_dist = u->dist + 1;
+						if(new_dist < helper[j]->dist){
+							helper[j]->dist = new_dist;
+							helper[j]->prev = u;
+						}
+					}
+				}
+				else{//we care about col-1 and col
+					if(helper[j]->pos.y == u->pos.y || helper[j]->pos.y == u->pos.y-1){
+						//we are adjacent!
+						int new_dist = u->dist + 1;
+						if(new_dist < helper[j]->dist){
+							helper[j]->dist = new_dist;
+							helper[j]->prev = u;
+						}
+					}
+				}
+			}
+		}
+		if(iteration%10==0)
+			std::cout << "\tIteration " << iteration << ": " << timer.GetElapsedTime() << "\n";
+	}
+
+	std::vector <sf::Vector2i> path;
+
+	if(u->pos == dest){
+		while(u->prev != NULL){
+			path.push_back(u->prev->pos);
+			u=u->prev;
+		}
+	}
+
+	a_monk->set_path(path);
+	helper.clear();
+
+	std::cout << "Pathing time: " << timer.GetElapsedTime() << "\n";
+}
+
+bool compare_function( monk* &a,  monk* &b){
+	if(a->get_pos().y < b->get_pos().y)
+		return true;
+	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
+		return true;
+	else
+		return false;
+}
+
+bool helpersort(path_helper* &a, path_helper* &b){
+	return a->dist < b->dist;
+}
+

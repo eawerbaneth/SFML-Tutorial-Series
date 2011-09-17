@@ -4,6 +4,7 @@
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <vector>
 
 const int dim = 100;
 const int citizen_dim = 75;
@@ -26,7 +27,7 @@ public:
 
 private:
 	bool occupied;
-	float z;
+	int  z;
 	char type;
 	sf::Sprite Sprite;
 	bool corrupted;
@@ -49,7 +50,9 @@ public:
 	bool request_occupy(tile* new_tile);
 	sf::Vector2i update();
 	void set_dest(sf::Vector2i newcoords){destcoords = newcoords;}
+	sf::Vector2i get_dest(){return destcoords;}
 	bool dest_reached(){return tilecoords==destcoords;}
+	void set_path(std::vector <sf::Vector2i> new_path){path = new_path;}
 
 
 protected:
@@ -57,6 +60,7 @@ protected:
 	sf::Sprite Sprite;
 	sf::Vector2i tilecoords;
 	sf::Vector2i destcoords;
+	std::vector <sf::Vector2i> path;
 
 };
 

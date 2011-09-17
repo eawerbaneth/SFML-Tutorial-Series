@@ -1,19 +1,6 @@
 ﻿  tile.cpp
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(4): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(19): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(19): warning C4244: 'argument' : conversion from 'float' to 'int', possible loss of data
 c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(22): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
 c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(22): warning C4244: 'argument' : conversion from 'const int' to 'float', possible loss of data
 c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(24): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
 c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\tile.cpp(24): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-  main.cpp
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(62): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(62): warning C4244: 'argument' : conversion from 'double' to 'float', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(101): warning C4018: '<' : signed/unsigned mismatch
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(125): warning C4244: 'initializing' : conversion from 'const float' to 'unsigned int', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(129): warning C4244: 'initializing' : conversion from 'const float' to 'unsigned int', possible loss of data
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(134): warning C4018: '<=' : signed/unsigned mismatch
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(152): warning C4018: '<' : signed/unsigned mismatch
-c:\users\ryan tarte\sfml-tutorial-series\god-of-fire\god-of-fire\main.cpp(152): warning C4018: '<=' : signed/unsigned mismatch
-  Generating Code...
   god-of-fire.vcxproj -> C:\Users\Ryan Tarte\SFML-Tutorial-Series\god-of-fire\Debug\god-of-fire.exe
