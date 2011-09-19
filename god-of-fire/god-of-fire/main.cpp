@@ -60,7 +60,7 @@ int main(){
 		old_mouse_coords = screen.ConvertCoords((unsigned)mouse_coords.x, (unsigned)mouse_coords.y);
 		mouse_coords = screen.ConvertCoords(screen.GetInput().GetMouseX(), 
 			screen.GetInput().GetMouseY());
-		if(screen.GetInput().IsMouseButtonDown(sf::Mouse::Left))
+		if(screen.GetInput().IsMouseButtonDown(sf::Mouse::Right))
 			View.Move(-1.5f*(mouse_coords.x-old_mouse_coords.x), 
 			-1.5f*(mouse_coords.y-old_mouse_coords.y));
 

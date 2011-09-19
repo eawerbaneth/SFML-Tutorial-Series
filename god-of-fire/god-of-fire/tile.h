@@ -46,6 +46,7 @@ public:
 	sf::IntRect get_rect(){return Sprite.GetSubRect();}
 	sf::Vector2i get_tile(){return tilecoords;}
 
+	//neutral utilities
 	bool request_occupy(tile* new_tile);
 	sf::Vector2i update();
 	void set_dest(sf::Vector2i newcoords){destcoords = newcoords;}
