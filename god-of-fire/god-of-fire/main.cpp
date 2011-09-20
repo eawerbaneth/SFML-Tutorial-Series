@@ -5,12 +5,6 @@
 sf::Image tileset;
 sf::Image monk_sprites;
 
-struct path_helper{
-	int dist;
-	path_helper* prev;
-	sf::Vector2i pos;
-};
-
 //input utilities
 bool handle_events(sf::RenderWindow &screen, sf::View &View);
 void keyboard_input(sf::RenderWindow &screen, sf::View &View);
@@ -361,4 +355,3 @@ bool compare_function( monk* &a,  monk* &b){
 bool helpersort(path_helper* &a, path_helper* &b){
 	return a->dist < b->dist;
 }
-

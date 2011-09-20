@@ -1,4 +1,8 @@
 //tile.h
+
+#ifndef _TILE_H_
+#define _TILE_H
+
 #include <SFML\Graphics.hpp>
 #include <string>
 #include <iostream>
@@ -56,6 +60,7 @@ public:
 
 protected:
 	int type;
+	sf::Image *my_Image;
 	sf::Sprite Sprite;
 	sf::Vector2i tilecoords;
 	sf::Vector2i destcoords;
@@ -65,13 +70,36 @@ protected:
 
 class faithful: public monk{
 public:
+	faithful(){}
+	faithful(tile* my_tile, int Type, sf::Image *Image, tile* destination);
+	//detonation utilites
+	std::vector <sf::Vector2i> get_range(std::vector <std::vector <tile*>> &map);
+	void set_target(tile* target);
+	bool select();
+	//general update
+	sf::Vector2i update();
 
+private:
+	bool selected;
+	bool detonated;
+	int death_walk;
+	std::vector <sf::Vector2i> deto_range;
 
 };
 
 class corrupted: public monk{
 public:
-
+	corrupted(){}
+	corrupted(tile* my_tile, int Type, sf::Image *Image, tile* destination);
 
 };
 
+
+struct path_helper{
+	int dist;
+	path_helper* prev;
+	sf::Vector2i pos;
+};
+
+
+#endif
