@@ -16,7 +16,7 @@ void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &ma
 
 //drawing utilties
 void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
-void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, std::vector <monk*> &monks);
+void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
 //void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
 //updates
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
@@ -29,6 +29,7 @@ bool helpersort(path_helper* &a, path_helper* &b);
 void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
 void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks);
 bool left_click(sf::Vector2f mouse_coords, std::vector <faithful*> &f_monks, faithful* &chosen);
+void highlight_tiles(std::vector <std::vector<tile*>> &map, faithful* &chosen);
 
 
 int main(){
@@ -53,6 +54,7 @@ int main(){
 	//get our first faithful
 	convert(monks, f_monks);
 	bool selected = false;
+	bool was_selected = false;
 	
 	sf::Vector2i mapsize(map[0].size()*dim, map.size()*dim/4+dim);
 	
@@ -92,10 +94,21 @@ int main(){
 					//(float)col*dim, (float)row*dim/4);
 					int row = global_mouse_coords.y /dim*4;
 					int col = global_mouse_coords.x / dim;
-					selected=(!chosen->detonate(map[row][col]));
+					if(map[row][col]->is_highlighted())
+						selected=(!chosen->detonate(map[row][col]));
 				}
 			}
 		}
+
+
+		//handle highlighting tiles
+		if((!was_selected && selected) || (!selected && was_selected)){
+			highlight_tiles(map, chosen);
+		}
+
+		was_selected = selected;
+
+
 
 		//keyboard control
 		keyboard_input(screen, View);
@@ -110,7 +123,7 @@ int main(){
 		screen.Clear();
 		screen.SetView(View);	
 		//printmap(screen, map, monks);
-		printmapdynamic(screen, map, View, monks);
+		printmapdynamic(screen, map, View, monks, f_monks);
 		//printmonks(screen, monks);
 		screen.SetView(screen.GetDefaultView());
 		screen.Display();
@@ -157,8 +170,9 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 
 //print map dynamically
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, 
-	sf::View &View, std::vector <monk*> &monks){
+					 sf::View &View, std::vector <monk*> &monks, std::vector<faithful*> &f_monks){
 	unsigned int mnk = 0;
+	unsigned int faith=0;
 	unsigned int row = (unsigned)(View.GetRect().Top)/dim;
 	if(row<0) row=0;
 
@@ -172,6 +186,11 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 			if(monks[mnk]->get_tile().x == row)
 				screen.Draw(monks[mnk]->get_sprite());
 			mnk++;
+		}
+		while(faith < f_monks.size() && (unsigned)f_monks[faith]->get_tile().x <=row){
+			if(f_monks[faith]->get_tile().x == row)
+				screen.Draw(f_monks[faith]->get_sprite());
+			faith++;
 		}
 	}
 
@@ -230,7 +249,7 @@ bool readmap(std::vector <std::vector <tile*>> &map){
 	//boring initializations
 	std::ifstream input;
 	
-	if(!tileset.LoadFromFile("imgs/modtiles2.png"))
+	if(!tileset.LoadFromFile("imgs/modtiles3.png"))
 		return false;
 
 	input.open("maps/proxy2.txt");
@@ -447,14 +466,26 @@ void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks){
 //allow a faithful to be selected
 bool left_click(sf::Vector2f mouse_coords, std::vector <faithful*> &f_monks, faithful* &chosen){
 	//go through monks in reverse order
-	for(unsigned int i=f_monks.size()-1; i>=0; i--){
-		sf::FloatRect monk_rect(f_monks[i]->get_pos().y, f_monks[i]->get_pos().x, 
-			f_monks[i]->get_pos().y+f_monks[i]->get_sprite().GetSize().x, 
-			f_monks[i]->get_pos().x+f_monks[i]->get_sprite().GetSize().y);
+	for(int i=f_monks.size()-1; i>=0; i--){
+		sf::FloatRect monk_rect(f_monks[i]->get_pos().x, f_monks[i]->get_pos().y, 
+			f_monks[i]->get_pos().x+f_monks[i]->get_sprite().GetSize().x, 
+			f_monks[i]->get_pos().y+f_monks[i]->get_sprite().GetSize().y);
 		//if we've clicked on this monk, return whether it's selected or deselected
-		if(monk_rect.Contains(mouse_coords.x, mouse_coords.y))
-			return f_monks[i]->select();
+		if(monk_rect.Contains(mouse_coords.x, mouse_coords.y)){
+			if(f_monks[i]->select()){
+				chosen = f_monks[i];
+				return true;
+			}
+		}
 	}
 
 	return false;
+}
+
+void highlight_tiles(std::vector <std::vector<tile*>> &map, faithful* &chosen){
+	std::vector <sf::Vector2i> range = chosen->get_range(map);
+
+	for(unsigned int i=0; i<range.size(); i++)
+		map[range[i].x][range[i].y]->highlight();	
+
 }

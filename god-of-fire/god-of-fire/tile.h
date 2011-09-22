@@ -25,8 +25,11 @@ public:
 	sf::IntRect get_rect(){return Sprite.GetSubRect();}
 	sf::Vector2i get_coords(){return coords;}
 	bool is_occupied(){return occupied;}
+	bool is_highlighted(){return highlighted;}
 	bool occupy();
 	bool ignite();
+	void highlight();
+	
 
 private:
 	bool occupied;
@@ -37,6 +40,7 @@ private:
 	sf::Vector2i coords;
 	bool ignited;
 	int firedur;
+	bool highlighted;
 };
 
 class monk{

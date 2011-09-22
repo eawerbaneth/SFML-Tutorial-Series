@@ -13,6 +13,7 @@ tile::tile(int row, int col, int Z, char Type, sf::Image *Image){
 	coords = sf::Vector2i(row, col);
 	occupied = false;
 	ignited = false;
+	highlighted = false;
 
 	//wall
 	if(type == 'X'){ xmod = 2; z=3;}
@@ -40,6 +41,7 @@ bool tile::occupy(){
 		return false;
 }
 
+//let the motherf***er burn
 bool tile::ignite(){
 	//if we're looking at a water tile or a wall tile, we can't set it on fire
 	if(type != ' ')
@@ -56,6 +58,26 @@ bool tile::ignite(){
 
 	return true;
 }
+
+//highlight the tile
+void tile::highlight(){
+	//we're not going to highlight walls or water
+	if(type == 'X' || type == 'O') return;
+	
+	int xmod;
+	//if it's already been highlighted, unhighlight it
+	if(highlighted){
+		highlighted=false;
+		xmod = 1;
+	}
+	//highlight it
+	else{
+		highlighted = true;
+		xmod = 5;
+	}
+	Sprite.SetSubRect(sf::IntRect(xmod*dim, z*dim, (xmod + 1)*dim, (z + 1)*dim));
+}
+
 
 //monk implementation
 monk::monk(tile* my_tile, sf::Image *Image, tile* destination){
@@ -152,14 +174,15 @@ std::vector <sf::Vector2i> faithful::get_range(std::vector <std::vector <tile*>>
 	std::vector <path_helper*> helper;
 
 	//we don't really need to check our entire map for this range
-	int row = tilecoords.y - 5;
+	int row = tilecoords.x - 5;
 	if(row  < 0) row = 0;
-	int col = tilecoords.x - 5;
-	if(col < 0) col = 0;
+	
 
 	//we're only going to be looking at a subset of our map for this
-	for(row; row<(signed)map.size()-2 && row<tilecoords.y+5; row++){
-		for(col; col<(signed)map[row].size()-2 && col<tilecoords.x+5; col++){
+	for(row; row<(signed)map.size()-2 && row<tilecoords.x+5; row++){
+		int col = tilecoords.y - 5;
+		if(col < 0) col = 0;
+		for(col; col<(signed)map[row].size()-2 && col<tilecoords.y+5; col++){
 			if(map[row][col]->get_type() == ' '){
 				path_helper* temp = new path_helper;
 				temp->pos = sf::Vector2i(row, col);
@@ -171,6 +194,7 @@ std::vector <sf::Vector2i> faithful::get_range(std::vector <std::vector <tile*>>
 				helper.push_back(temp);
 			}
 		}
+
 	}
 
 	path_helper* u;
