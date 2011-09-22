@@ -72,6 +72,18 @@ monk::monk(tile* my_tile, sf::Image *Image, tile* destination){
 
 }
 
+monk::monk(sf::Vector2i my_tile, sf::Vector2i my_dest, sf::Vector2f my_pos, sf::Image *Image){
+	Sprite.SetImage(*Image);
+	int xmod = 0;
+	tilecoords = my_tile;
+	destcoords = my_dest;
+
+	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
+		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
+
+	Sprite.SetPosition(my_pos);
+}
+
 //try to move onto a new tile
 bool monk::request_occupy(tile* new_tile){
 	//if(new_tile->occupy()){
@@ -225,6 +237,7 @@ bool faithful::select(){
 	return false;
 }
 
+//returns true if successful, false if not
 bool faithful::detonate(tile* target){
 	if(selected == true){
 		//make sure the target is within range
@@ -274,4 +287,3 @@ corrupted::corrupted(tile* my_tile, sf::Image *Image, tile* destination){
 		my_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
 
 }
-

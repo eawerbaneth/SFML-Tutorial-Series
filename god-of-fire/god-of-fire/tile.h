@@ -43,6 +43,7 @@ class monk{
 public:
 	monk(){}
 	monk(tile* my_tile, sf::Image *Image, tile* destination);
+	monk(sf::Vector2i my_tile, sf::Vector2i my_dest, sf::Vector2f my_pos, sf::Image *Image);
 
 	//accessing privates
 	sf::Vector2f get_pos(){return Sprite.GetPosition();}
@@ -72,6 +73,8 @@ public:
 	faithful(){}
 	faithful(tile* my_tile, sf::Image *Image, tile* destination);
 	faithful(monk* old_monk, sf::Image* Image);
+	//accessing privates
+	bool is_selected(){return selected;}
 	//detonation utilites
 	std::vector <sf::Vector2i> get_range(std::vector <std::vector <tile*>> &map);
 	bool detonate(tile* target);

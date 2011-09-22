@@ -4,6 +4,7 @@
 
 sf::Image tileset;
 sf::Image monk_sprites;
+int benevolence;
 
 //input utilities
 bool handle_events(sf::RenderWindow &screen, sf::View &View);
@@ -20,9 +21,14 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 //updates
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
 bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
-bool compare_function( monk* &a,  monk* &b);
+bool compare_monks( monk* &a,  monk* &b);
+bool compare_faithful(faithful* &a, faithful* &b);
+bool compare_corrupted(corrupted* &a, corrupted* &b);
 bool helpersort(path_helper* &a, path_helper* &b);
+//faithful functions
 void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
+void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks);
+bool left_click(sf::Vector2f mouse_coords, std::vector <faithful*> &f_monks, faithful* &chosen);
 
 
 int main(){
@@ -43,6 +49,10 @@ int main(){
 	std::vector <faithful*> f_monks;
 	std::vector <corrupted*> c_monks;
 	faithful* chosen;
+	benevolence = 1;
+	//get our first faithful
+	convert(monks, f_monks);
+	bool selected = false;
 	
 	sf::Vector2i mapsize(map[0].size()*dim, map.size()*dim/4+dim);
 	
@@ -58,9 +68,34 @@ int main(){
 		old_mouse_coords = screen.ConvertCoords((unsigned)mouse_coords.x, (unsigned)mouse_coords.y);
 		mouse_coords = screen.ConvertCoords(screen.GetInput().GetMouseX(), 
 			screen.GetInput().GetMouseY());
+		//user right-clicked
 		if(screen.GetInput().IsMouseButtonDown(sf::Mouse::Right))
 			View.Move(-1.5f*(mouse_coords.x-old_mouse_coords.x), 
 			-1.5f*(mouse_coords.y-old_mouse_coords.y));
+		//user left-clicked
+		if(screen.GetInput().IsMouseButtonDown(sf::Mouse::Left)){
+			sf::Vector2f global_mouse_coords(mouse_coords.x+View.GetRect().Left, mouse_coords.y+View.GetRect().Top);
+			//if we're free to choose a monk
+			if(!selected)
+				selected = left_click(global_mouse_coords, f_monks, chosen);
+			//the user is either trying to deslect or detonate
+			else{
+				//check for deselect
+				sf::FloatRect chosen_rect(chosen->get_pos().y, chosen->get_pos().x,
+					chosen->get_pos().y+chosen->get_sprite().GetSize().x, 
+					chosen->get_pos().x+chosen->get_sprite().GetSize().y);
+				//if they clicked on the monk
+				if(chosen_rect.Contains(global_mouse_coords.x, global_mouse_coords.y))
+					selected = chosen->select();
+				//figure out which tile they clicked on
+				else{
+					//(float)col*dim, (float)row*dim/4);
+					int row = global_mouse_coords.y /dim*4;
+					int col = global_mouse_coords.x / dim;
+					selected=(!chosen->detonate(map[row][col]));
+				}
+			}
+		}
 
 		//keyboard control
 		keyboard_input(screen, View);
@@ -68,7 +103,7 @@ int main(){
 		//maintain boundaries
 		police_boundaries(View, mapsize);
 
-		if(frames%15==0)
+		if(frames%30==0)
 			monk_update(map, monks);
 
 		//display
@@ -117,7 +152,7 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			monks[i]->request_occupy(map[dest.x][dest.y]);
 		}	
 	}
-	sort(monks.begin(), monks.end(), compare_function);
+	sort(monks.begin(), monks.end(), compare_monks);
 }
 
 //print map dynamically
@@ -186,7 +221,7 @@ void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &ma
 		else i--;
 	}
 	
-	sort(monks.begin(), monks.end(), compare_function);
+	sort(monks.begin(), monks.end(), compare_monks);
 
 }
 
@@ -347,7 +382,25 @@ bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk){
 
 }
 
-bool compare_function( monk* &a,  monk* &b){
+bool compare_monks( monk* &a,  monk* &b){
+	if(a->get_pos().y < b->get_pos().y)
+		return true;
+	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
+		return true;
+	else
+		return false;
+}
+
+bool compare_faithful( faithful* &a,  faithful* &b){
+	if(a->get_pos().y < b->get_pos().y)
+		return true;
+	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
+		return true;
+	else
+		return false;
+}
+
+bool compare_corrupted( corrupted* &a,  corrupted* &b){
 	if(a->get_pos().y < b->get_pos().y)
 		return true;
 	else if(a->get_pos().y == b->get_pos().y && a->get_pos().x < b->get_pos().x)
@@ -360,10 +413,48 @@ bool helpersort(path_helper* &a, path_helper* &b){
 	return a->dist < b->dist;
 }
 
+//convert a monk to a faithful
 void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks){
 	int acolyte = sf::Randomizer::Random(0, monks.size()-1);
 
+	faithful* converted = new faithful(monks[acolyte], &monk_sprites);
+	f_monks.push_back(converted);
+	monks.erase(monks.begin()+acolyte);
+
+	sort(f_monks.begin(), f_monks.end(), compare_faithful);
+
+}
+
+//convert a faithful to a monk
+void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks){
+	if(f_monks.size()==0 || (f_monks.size()==1 && f_monks[0]->is_selected()))
+		return;
+
+	bool lock = true;
+	while(lock){
+		int fallen = sf::Randomizer::Random(0, f_monks.size()-1);
+		if(!f_monks[fallen]->is_selected()){
+			lock = false;
+			monks.push_back(new monk(f_monks[fallen]->get_tile(), f_monks[fallen]->get_dest(),
+				f_monks[fallen]->get_pos(), &monk_sprites));
+			f_monks.erase(f_monks.begin()+fallen);
+		}
+	}
+
+}
 
 
+//allow a faithful to be selected
+bool left_click(sf::Vector2f mouse_coords, std::vector <faithful*> &f_monks, faithful* &chosen){
+	//go through monks in reverse order
+	for(unsigned int i=f_monks.size()-1; i>=0; i--){
+		sf::FloatRect monk_rect(f_monks[i]->get_pos().y, f_monks[i]->get_pos().x, 
+			f_monks[i]->get_pos().y+f_monks[i]->get_sprite().GetSize().x, 
+			f_monks[i]->get_pos().x+f_monks[i]->get_sprite().GetSize().y);
+		//if we've clicked on this monk, return whether it's selected or deselected
+		if(monk_rect.Contains(mouse_coords.x, mouse_coords.y))
+			return f_monks[i]->select();
+	}
 
+	return false;
 }
