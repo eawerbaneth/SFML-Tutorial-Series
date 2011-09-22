@@ -12,6 +12,7 @@ tile::tile(int row, int col, int Z, char Type, sf::Image *Image){
 	int xmod=0;
 	coords = sf::Vector2i(row, col);
 	occupied = false;
+	ignited = false;
 
 	//wall
 	if(type == 'X'){ xmod = 2; z=3;}
@@ -39,8 +40,25 @@ bool tile::occupy(){
 		return false;
 }
 
-monk::monk(tile* my_tile, int Type, sf::Image *Image, tile* destination){
-	type = Type;
+bool tile::ignite(){
+	//if we're looking at a water tile or a wall tile, we can't set it on fire
+	if(type != ' ')
+		return false;
+	//if it's already on fire, we can't re-ignite it
+	if(ignited)
+		return false;
+
+	//go ahead and set this guy on fire
+	ignited = true;
+	int xmod = 4;
+	Sprite.SetSubRect(sf::IntRect(xmod*dim, z*dim, (xmod + 1)*dim, (z + 1)*dim));
+	firedur = 0;
+
+	return true;
+}
+
+//monk implementation
+monk::monk(tile* my_tile, sf::Image *Image, tile* destination){
 	Sprite.SetImage(*Image);
 	int xmod=0;
 	tilecoords = my_tile->get_coords();
@@ -51,18 +69,18 @@ monk::monk(tile* my_tile, int Type, sf::Image *Image, tile* destination){
 
 	Sprite.SetPosition(my_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
 		my_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
-	
+
 }
 
 //try to move onto a new tile
 bool monk::request_occupy(tile* new_tile){
 	//if(new_tile->occupy()){
-		Sprite.SetPosition(new_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
-			new_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
-		tilecoords = new_tile->get_coords();
-		if(!path.empty())
-			path.pop_back();
-		return true;
+	Sprite.SetPosition(new_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
+		new_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
+	tilecoords = new_tile->get_coords();
+	if(!path.empty())
+		path.pop_back();
+	return true;
 	//}
 	//else
 	//	return false;
@@ -77,9 +95,8 @@ sf::Vector2i monk::update(){
 
 
 //faithful implementation
-faithful::faithful(tile* my_tile, int Type, sf::Image *Image, tile* destination){
+faithful::faithful(tile* my_tile, sf::Image *Image, tile* destination){
 	Sprite.SetImage(*Image);
-	type = Type;
 	tilecoords = my_tile->get_coords();
 	destcoords = destination->get_coords();
 	selected = false;
@@ -95,10 +112,30 @@ faithful::faithful(tile* my_tile, int Type, sf::Image *Image, tile* destination)
 
 }
 
+faithful::faithful(monk* old_monk, sf::Image *Image){
+	Sprite = old_monk->get_sprite();
+	tilecoords = old_monk->get_tile();
+	destcoords = old_monk->get_dest();
+	selected = false;
+	detonated = false;
+	death_walk = 0;
+	my_Image = Image;
+
+	Sprite.SetSubRect(sf::IntRect(2*citizen_dim, 0, 2*citizen_dim+citizen_dim, 
+		my_Image->GetHeight()));
+
+	Sprite.SetPosition(old_monk->get_pos());
+
+}
+
 std::vector <sf::Vector2i> faithful::get_range(std::vector <std::vector <tile*>> &map){
 	//we're going to store everything within <allowance> tiles in this vector
 	int allowance = 3;
 	std::vector <sf::Vector2i> range;
+
+	//if this monk hasn't been selected, we're not going to let main see its range
+	if(!selected)
+		return range;
 
 	std::vector <path_helper*> helper;
 
@@ -167,7 +204,7 @@ std::vector <sf::Vector2i> faithful::get_range(std::vector <std::vector <tile*>>
 }
 
 //we're going to entrust the task of enforcing one selected monk at a time to main
-bool select(){
+bool faithful::select(){
 	//if the monk has already detonated himself, don't let the user select him
 	if(!detonated){
 		if(!selected){
@@ -184,43 +221,47 @@ bool select(){
 			return false;
 		}
 	}
+	//couldn't be selected, sends the signal to highlight
 	return false;
 }
 
-void faithful::set_target(tile* target){
-	
+bool faithful::detonate(tile* target){
 	if(selected == true){
 		//make sure the target is within range
 		bool found = false;
 		for(unsigned int i=0; i<deto_range.size(); i++)
 			if(deto_range[i]==target->get_coords())
 				found = true;
-		
+
 		//if it was, then detonate and and set destination
 		if(found){
 			detonated = true;
 			destcoords = target->get_coords();
 			Sprite.SetSubRect(sf::IntRect(4*citizen_dim, 0, 4*citizen_dim+citizen_dim, 
 				my_Image->GetHeight()));
+			return true;
 		}
 	}
+	return false;
 }
 
-sf::Vector2i faithful::update(){
+bool faithful::update(std::vector <std::vector <tile*>> &map){
 	//first check whether or not the monk has been detonated
 	if(detonated){
-
-
+		//check to see if it's time for us to die
+		if(death_walk>3)
+			return true;
+		//we're going to set our current tile on fire
+		map[tilecoords.x][tilecoords.y]->ignite();
+		death_walk++;
+		return false;
 	}
-	else{
-
-
-	}
+	//we're in standby, do nothing
+	return false;
 }
 
 //corrupted implementation
-corrupted::corrupted(tile* my_tile, int Type, sf::Image *Image, tile* destination){
-	type = Type;
+corrupted::corrupted(tile* my_tile, sf::Image *Image, tile* destination){
 	Sprite.SetImage(*Image);
 	int xmod=1;
 	tilecoords = my_tile->get_coords();

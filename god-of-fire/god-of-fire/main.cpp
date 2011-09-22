@@ -22,6 +22,7 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
 bool compare_function( monk* &a,  monk* &b);
 bool helpersort(path_helper* &a, path_helper* &b);
+void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
 
 
 int main(){
@@ -39,6 +40,9 @@ int main(){
 	if(!readmap(map))
 		return 0;
 	load_monks(monks, map);
+	std::vector <faithful*> f_monks;
+	std::vector <corrupted*> c_monks;
+	faithful* chosen;
 	
 	sf::Vector2i mapsize(map[0].size()*dim, map.size()*dim/4+dim);
 	
@@ -166,7 +170,7 @@ void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &ma
 		int randy = sf::Randomizer().Random(2, map[0].size()-3);
 		//if that tile is open, make the monk
 		if(map[randx][randy]->get_type()==' ' && !map[randx][randy]->is_occupied()){
-			monks.push_back(new monk(map[randx][randy], 0, &monk_sprites, map[0][0]));
+			monks.push_back(new monk(map[randx][randy], &monk_sprites, map[0][0]));
 			//deal with pathing
 			bool lock = true;
 			while(lock){
@@ -354,4 +358,12 @@ bool compare_function( monk* &a,  monk* &b){
 
 bool helpersort(path_helper* &a, path_helper* &b){
 	return a->dist < b->dist;
+}
+
+void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks){
+	int acolyte = sf::Randomizer::Random(0, monks.size()-1);
+
+
+
+
 }
