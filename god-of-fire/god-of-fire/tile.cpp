@@ -63,7 +63,7 @@ bool tile::ignite(){
 void tile::highlight(){
 	//we're not going to highlight walls or water
 	if(type == 'X' || type == 'O') return;
-	
+
 	int xmod;
 	//if it's already been highlighted, unhighlight it
 	if(highlighted){
@@ -176,7 +176,7 @@ std::vector <sf::Vector2i> faithful::get_range(std::vector <std::vector <tile*>>
 	//we don't really need to check our entire map for this range
 	int row = tilecoords.x - 5;
 	if(row  < 0) row = 0;
-	
+
 
 	//we're only going to be looking at a subset of our map for this
 	for(row; row<(signed)map.size()-2 && row<tilecoords.x+5; row++){
@@ -282,32 +282,48 @@ bool faithful::detonate(tile* target){
 	return false;
 }
 
+//return true if it's time to die, else return false
 bool faithful::update(std::vector <std::vector <tile*>> &map){
 	//first check whether or not the monk has been detonated
 	if(detonated){
-		//check to see if it's time for us to die
-		if(death_walk>3)
-			return true;
 		//we're going to set our current tile on fire
 		map[tilecoords.x][tilecoords.y]->ignite();
+		//check to see if it's time for us to die
+		if(death_walk>4)
+			return true;
 		death_walk++;
-		return false;
+		//go to next tile on path
+		if(!path.empty()){
+			tile* next_tile = map[path[path.size()-1].x][path[path.size()-1].y];
+			Sprite.SetPosition(next_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
+				next_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
+			tilecoords = next_tile->get_coords();
+			path.pop_back();
+		}
+		else{
+			tile* next_tile = map[destcoords.x][destcoords.y];
+			Sprite.SetPosition(next_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
+				next_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
+			map[tilecoords.x][tilecoords.y]->ignite();
+			return true;
+		}
 	}
+
 	//we're in standby, do nothing
 	return false;
 }
 
-//corrupted implementation
-corrupted::corrupted(tile* my_tile, sf::Image *Image, tile* destination){
-	Sprite.SetImage(*Image);
-	int xmod=1;
-	tilecoords = my_tile->get_coords();
-	destcoords = destination->get_coords();
+	//corrupted implementation
+	corrupted::corrupted(tile* my_tile, sf::Image *Image, tile* destination){
+		Sprite.SetImage(*Image);
+		int xmod=1;
+		tilecoords = my_tile->get_coords();
+		destcoords = destination->get_coords();
 
-	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
-		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
+		Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
+			xmod*citizen_dim+citizen_dim, Image->GetHeight()));
 
-	Sprite.SetPosition(my_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
-		my_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
+		Sprite.SetPosition(my_tile->get_pos().x+(dim/2-Sprite.GetSubRect().GetWidth()/2),
+			my_tile->get_pos().y+(dim/2-Sprite.GetSubRect().GetHeight()));
 
-}
+	}
