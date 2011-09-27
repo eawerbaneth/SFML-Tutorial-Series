@@ -26,6 +26,7 @@ public:
 	bool is_occupied(){return occupied;}
 	bool is_highlighted(){return highlighted;}
 	bool is_corrupted(){return corrupted;}
+	bool is_ignited(){return ignited;}
 	bool occupy();
 	bool ignite();
 	void highlight();

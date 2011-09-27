@@ -14,12 +14,14 @@ public:
 
 	//neutral utilities
 	bool request_occupy(tile* new_tile);
-	sf::Vector2i update();
+	//sf::Vector2i update();
 	void set_dest(sf::Vector2i newcoords){destcoords = newcoords;}
 	sf::Vector2i get_dest(){return destcoords;}
 	bool dest_reached(){return tilecoords==destcoords;}
 	void set_path(std::vector <sf::Vector2i> new_path){path = new_path;}
 	std::vector <sf::Vector2i> get_path(){return path;}
+	void ignite();
+	bool update(sf::Vector2i &next);
 
 protected:
 	sf::Image *my_Image;
@@ -27,6 +29,8 @@ protected:
 	sf::Vector2i tilecoords;
 	sf::Vector2i destcoords;
 	std::vector <sf::Vector2i> path;
+	bool ignited;
+	int death_walk;
 
 };
 
@@ -47,7 +51,6 @@ public:
 private:
 	bool selected;
 	bool detonated;
-	int death_walk;
 	std::vector <sf::Vector2i> deto_range;
 
 };

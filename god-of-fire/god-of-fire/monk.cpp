@@ -10,6 +10,8 @@ monk::monk(tile* my_tile, sf::Image *Image, tile* destination){
 	int xmod=0;
 	tilecoords = my_tile->get_coords();
 	destcoords = destination->get_coords();
+	ignited = false;
+	death_walk=3;
 
 	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
 		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
@@ -24,6 +26,7 @@ monk::monk(sf::Vector2i my_tile, sf::Vector2i my_dest, sf::Vector2f my_pos, sf::
 	int xmod = 0;
 	tilecoords = my_tile;
 	destcoords = my_dest;
+	ignited = false;
 
 	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
 		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
@@ -45,13 +48,30 @@ bool monk::request_occupy(tile* new_tile){
 	//	return false;
 }
 
-sf::Vector2i monk::update(){
+//return false if the monk got killed
+bool monk::update(sf::Vector2i &next){
+	if(ignited){
+		death_walk--;
+		if(death_walk<0)
+			return false;
+	}
+
 	if(!path.empty())
-		return path[path.size()-1];
+		next = path[path.size()-1];
 	else
-		return destcoords;
+		next = destcoords;
+	return true;
 }
 
+void monk::ignite(){
+	ignited = true;
+	int xmod = 4;
+	death_walk=3;
+	
+	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
+		xmod*citizen_dim+citizen_dim, Sprite.GetSize().y));
+
+}
 
 //faithful implementation
 faithful::faithful(tile* my_tile, sf::Image *Image, tile* destination){
@@ -244,6 +264,7 @@ corrupted::corrupted(tile* my_tile, sf::Image *Image, tile* destination){
 	int xmod=1;
 	tilecoords = my_tile->get_coords();
 	destcoords = destination->get_coords();
+	ignited = false;
 
 	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0, 
 		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
@@ -259,6 +280,7 @@ corrupted::corrupted(monk* old_monk, sf::Image *Image){
 	destcoords = old_monk->get_dest();
 	my_Image = Image;
 	path = old_monk->get_path();
+	ignited = false;
 
 	int xmod = 1;
 

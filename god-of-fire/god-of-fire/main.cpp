@@ -139,6 +139,9 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 	std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks){
 	//give each monk a chance to update himself
 	for(unsigned int i=0; i<monks.size(); i++){
+		//check to see if we're gonna get set on fire
+		if(map[monks[i]->get_tile().x][monks[i]->get_tile().y]->is_ignited())
+			monks[i]->ignite();
 		//if we've reached our destination, find a new one
 		if(monks[i]->dest_reached()){
 			bool lock = true;
@@ -151,15 +154,22 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			}	
 		}
 		else{ //we haven't reached destination yet
-			sf::Vector2i dest = monks[i]->update();
+			sf::Vector2i dest;
+			if(!monks[i]->update(dest)){
+				monks.erase(monks.begin()+i);
+				i--;
+				continue;
+			}
 			//move if we can, if we can't: do nothing
-			monks[i]->request_occupy(map[dest.x][dest.y]);
+			else
+				monks[i]->request_occupy(map[dest.x][dest.y]);
 		}
 		//check to see if we're on a corrupted tile
 		if(map[monks[i]->get_tile().x][monks[i]->get_tile().y]->is_corrupted()){
 			corrupt(monks, c_monks);
 			i--;
 		}
+		//check if we're on a burning tile
 	}
 	sort(monks.begin(), monks.end(), compare_monks);
 
@@ -175,6 +185,9 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 	
 	//deal with corrupted
 	for(unsigned int j=0; j<c_monks.size(); j++){
+		//check to see if we're gonna set him on fire
+		if(map[c_monks[j]->get_tile().x][c_monks[j]->get_tile().y]->is_ignited())
+			c_monks[j]->ignite();
 		//follow standard monk update procedure
 		if(c_monks[j]->dest_reached()){
 			bool lock = true;
@@ -187,8 +200,14 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			}
 		}
 		else{
-			sf::Vector2i dest = c_monks[j]->update();
-			c_monks[j]->request_occupy(map[dest.x][dest.y]);
+			sf::Vector2i dest;
+			if(!c_monks[j]->update(dest)){
+				c_monks.erase(c_monks.begin()+j);
+				j--;
+				continue;
+			}
+			else
+				c_monks[j]->request_occupy(map[dest.x][dest.y]);
 		}
 		//now spread the corruption
 		c_monks[j]->c_update(map);
