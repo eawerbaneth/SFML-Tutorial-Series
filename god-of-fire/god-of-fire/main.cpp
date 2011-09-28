@@ -1,10 +1,11 @@
 //main.cpp
 #include <fstream>
-#include "tile.h"
+#include "monk.h"
 
 sf::Image tileset;
 sf::Image monk_sprites;
 int benevolence;
+int desolation;
 
 //input utilities
 bool handle_events(sf::RenderWindow &screen, sf::View &View);
@@ -16,13 +17,14 @@ bool left_click_collision(sf::Vector2f mouse_coords, std::vector <faithful*> &f_
 //game initializations
 bool readmap(std::vector <std::vector<tile*>> &map);
 void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &map);
-
 //drawing utilties
 void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
-void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
+void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, 
+	std::vector <monk*> &monks, std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks);
 //void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
 //updates
-void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
+void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks, std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks);
+void tile_update(std::vector <std::vector <tile*>> &map);
 bool find_path(std::vector <std::vector <tile*>> &map, monk* a_monk);
 bool compare_monks( monk* &a,  monk* &b);
 bool compare_faithful(faithful* &a, faithful* &b);
@@ -32,6 +34,8 @@ bool helpersort(path_helper* &a, path_helper* &b);
 void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks);
 void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks);
 void highlight_tiles(std::vector <std::vector<tile*>> &map, faithful* &chosen);
+//corrupted functions
+void corrupt(std::vector <monk*> &monks, std::vector <corrupted*> &c_monks);
 
 
 int main(){
@@ -53,8 +57,10 @@ int main(){
 	std::vector <corrupted*> c_monks;
 	faithful* chosen;
 	benevolence = 1;
+	desolation = 1;
 	//get our first faithful
 	convert(monks, f_monks);
+	corrupt(monks, c_monks);
 	bool selected = false;
 	bool was_selected = false;
 	sf::Clock click;
@@ -99,13 +105,16 @@ int main(){
 		//maintain boundaries
 		police_boundaries(View, mapsize);
 
-		if(frames%30==0)
-			monk_update(map, monks, f_monks);
+		//update monks
+		if(frames%30==0){
+			monk_update(map, monks, f_monks, c_monks);
+			tile_update(map);
+		}
 
 		//display
 		screen.Clear();
 		screen.SetView(View);	
-		printmapdynamic(screen, map, View, monks, f_monks);
+		printmapdynamic(screen, map, View, monks, f_monks, c_monks);
 		screen.SetView(screen.GetDefaultView());
 		screen.Display();
 
@@ -127,9 +136,12 @@ void rand_dest(int &x, int &y, std::vector <std::vector <tile*>> &map){
 
 //update monk behavior
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks, 
-	std::vector <faithful*> &f_monks){
+	std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks){
 	//give each monk a chance to update himself
 	for(unsigned int i=0; i<monks.size(); i++){
+		//check to see if we're gonna get set on fire
+		if(map[monks[i]->get_tile().x][monks[i]->get_tile().y]->is_ignited())
+			monks[i]->ignite();
 		//if we've reached our destination, find a new one
 		if(monks[i]->dest_reached()){
 			bool lock = true;
@@ -142,13 +154,26 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			}	
 		}
 		else{ //we haven't reached destination yet
-			sf::Vector2i dest = monks[i]->update();
+			sf::Vector2i dest;
+			if(!monks[i]->update(dest)){
+				monks.erase(monks.begin()+i);
+				i--;
+				continue;
+			}
 			//move if we can, if we can't: do nothing
-			monks[i]->request_occupy(map[dest.x][dest.y]);
-		}	
+			else
+				monks[i]->request_occupy(map[dest.x][dest.y]);
+		}
+		//check to see if we're on a corrupted tile
+		if(map[monks[i]->get_tile().x][monks[i]->get_tile().y]->is_corrupted()){
+			corrupt(monks, c_monks);
+			i--;
+		}
+		//check if we're on a burning tile
 	}
 	sort(monks.begin(), monks.end(), compare_monks);
 
+	//deal with faithful
 	for(unsigned int k=0; k<f_monks.size(); k++){
 		if(f_monks[k]->update(map)){
 			//kill the monk if it's his time to die
@@ -156,17 +181,50 @@ void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &mo
 			k--;
 		}
 	}
-
 	sort(f_monks.begin(), f_monks.end(), compare_faithful);
+	
+	//deal with corrupted
+	for(unsigned int j=0; j<c_monks.size(); j++){
+		//check to see if we're gonna set him on fire
+		if(map[c_monks[j]->get_tile().x][c_monks[j]->get_tile().y]->is_ignited())
+			c_monks[j]->ignite();
+		//follow standard monk update procedure
+		if(c_monks[j]->dest_reached()){
+			bool lock = true;
+			while(lock){
+				int x, y;
+				rand_dest(x, y, map);
+				c_monks[j]->set_dest(sf::Vector2i(x, y));
+				if(find_path(map, c_monks[j]))
+					lock = false;
+			}
+		}
+		else{
+			sf::Vector2i dest;
+			if(!c_monks[j]->update(dest)){
+				c_monks.erase(c_monks.begin()+j);
+				j--;
+				continue;
+			}
+			else
+				c_monks[j]->request_occupy(map[dest.x][dest.y]);
+		}
+		//now spread the corruption
+		c_monks[j]->c_update(map);
+	}
+	sort(c_monks.begin(), c_monks.end(), compare_corrupted);
+	
 	std::cout << "Updating...\n";
 
 }
 
 //print map dynamically
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, 
-					 sf::View &View, std::vector <monk*> &monks, std::vector<faithful*> &f_monks){
+					 sf::View &View, std::vector <monk*> &monks, std::vector<faithful*> &f_monks,
+					 std::vector<corrupted*> &c_monks){
 	unsigned int mnk = 0;
-	unsigned int faith=0;
+	unsigned int faith = 0;
+	unsigned int corr = 0;
 	unsigned int row = (unsigned)(View.GetRect().Top)/dim;
 	if(row<0) row=0;
 
@@ -186,8 +244,12 @@ void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>>
 				screen.Draw(f_monks[faith]->get_sprite());
 			faith++;
 		}
+		while(corr < c_monks.size() && (unsigned)c_monks[corr]->get_tile().x <= row){
+			if(c_monks[corr]->get_tile().x == row)
+				screen.Draw(c_monks[corr]->get_sprite());
+			corr++;
+		}
 	}
-
 }
 
 //print entire map
@@ -438,6 +500,18 @@ void convert(std::vector <monk*> &monks, std::vector <faithful*> &f_monks){
 
 }
 
+//conver a monk to a corrupted
+void corrupt(std::vector <monk*> &monks, std::vector <corrupted*> &c_monks){
+	int lost = sf::Randomizer::Random(0, monks.size()-1);
+
+	corrupted* fallen = new corrupted(monks[lost], &monk_sprites);
+	c_monks.push_back(fallen);
+	monks.erase(monks.begin()+lost);
+
+	sort(c_monks.begin(), c_monks.end(), compare_corrupted);
+
+}
+
 //convert a faithful to a monk
 void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks){
 	if(f_monks.size()==0 || (f_monks.size()==1 && f_monks[0]->is_selected()))
@@ -513,4 +587,11 @@ void handle_left_click(sf::Vector2f &global_mouse, std::vector <faithful*> &f_mo
 			}
 		}
 
+}
+
+//update tiles
+void tile_update(std::vector <std::vector <tile*>> &map){
+	for(unsigned int i=0; i<map.size(); i++)
+		for(unsigned int k=0; k<map[i].size(); k++)
+			map[i][k]->update(map);
 }
