@@ -57,9 +57,16 @@ bool tile::ignite(){
 	ignited = true;
 	int xmod = 4;
 	Sprite.SetSubRect(sf::IntRect(xmod*dim, z*dim, (xmod + 1)*dim, (z + 1)*dim));
-	firedur = 0;
+	//firedur = 0;
 
 	return true;
+}
+
+void tile::extinguish(){
+	ignited = false;
+	int xmod = 1;
+	Sprite.SetSubRect(sf::IntRect(xmod*dim, z*dim, (xmod + 1)*dim, (z + 1)*dim));
+
 }
 
 //highlight the tile
@@ -98,44 +105,8 @@ void tile::corrupt(){
 }
 
 void tile::update(std::vector <std::vector<tile*>> &map){
-	//if the tile is on fire
-	if(ignited){
-		//set surrounding tiles on fire on last turn
-		if(firedur == 2){
-			if(coords.x>0)
-				map[coords.x-1][coords.y]->ignite();
-			if(coords.x<(signed)map.size()-1)
-				map[coords.x+1][coords.y]->ignite();
-			//even row, look at col+1
-			if(coords.x%2==0 && coords.y<(signed)map[coords.x].size()-1){
-				if(coords.x>0)
-					map[coords.x-1][coords.y+1]->ignite();
-				if(coords.x<(signed)map.size()-1)
-					map[coords.x+1][coords.y+1]->ignite();
-			}
-			//odd row, look at col and col-1
-			else if(coords.y > 0){
-				if(coords.x>0)
-					map[coords.x-1][coords.y-1]->ignite();
-				if(coords.x<(signed)map.size()-1)
-					map[coords.x+1][coords.y-1]->ignite();
-			}
-		}
-		//and burn out
-		if(firedur > 2){
-			ignited = false;
-			int xmod;
-			if(type == ' ')
-				xmod = 1;
-			if(type == 'X')
-				xmod = 2;
-			invulnerable = 5;
-			Sprite.SetSubRect(sf::IntRect(xmod*dim, z*dim, (xmod + 1)*dim, (z + 1)*dim));
-		}
-		firedur++;
-	}
 	//if tile is corrupted, spread the corruption after a few turns
-	else if(corrupted){
+	if(corrupted){
 		if(corruption_cooldown > 2){
 			if(coords.x>0)
 				map[coords.x-1][coords.y]->corrupt();
