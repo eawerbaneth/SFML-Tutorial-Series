@@ -175,9 +175,11 @@ void intro_screen(sf::RenderWindow &screen){
 
 //debugging
 void draw_selector(sf::RenderWindow &screen, sf::Vector2f global_mouse, sf::Sprite &selector){
+	int col = global_mouse.x/dim;
+	int row = global_mouse.y/dim/4;
+	sf::Vector2f new_coords = sf::Vector2f(col*dim, row*dim*4);
 	selector.SetPosition(global_mouse);
 	screen.Draw(selector);
-
 }
 
 

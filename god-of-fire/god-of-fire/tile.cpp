@@ -26,6 +26,7 @@ tile::tile(int row, int col, int Z, char Type, sf::Image *Image){
 	else
 		Sprite.SetPosition((float)col*dim-dim/2, (float)row*dim/4);
 
+
 }
 
 //respond to a monk trying to move onto us (should only be called from monk)

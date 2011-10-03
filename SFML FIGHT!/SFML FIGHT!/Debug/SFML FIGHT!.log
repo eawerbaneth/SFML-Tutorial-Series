@@ -1,7 +1,19 @@
-﻿  special.cpp
-  player.cpp
+﻿  player.cpp
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.h(6): warning C4305: 'initializing' : truncation from 'double' to 'const float'
   misc.cpp
-c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.cpp(4): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.h(6): warning C4305: 'initializing' : truncation from 'double' to 'const float'
   main.cpp
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.h(6): warning C4305: 'initializing' : truncation from 'double' to 'const float'
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(241): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(241): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(245): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(245): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(249): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(249): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\main.cpp(260): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+  Generating Code...
+  Compiling...
+  special.cpp
+c:\users\ryan tarte\sfml-tutorial-series\sfml fight!\sfml fight!\misc.h(6): warning C4305: 'initializing' : truncation from 'double' to 'const float'
   Generating Code...
   SFML FIGHT!.vcxproj -> C:\Users\Ryan Tarte\SFML-Tutorial-Series\SFML FIGHT!\Debug\SFML FIGHT!.exe
