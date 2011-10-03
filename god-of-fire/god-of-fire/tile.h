@@ -9,22 +9,48 @@
 #include <algorithm>
 #include <iomanip>
 #include <vector>
+//#include "fire.h"
 
 const int dim = 100;
 const int citizen_dim = 75;
 
-/*
-class fire{
+class tile;
+
+class fire_node{
 public:
-	fire::fire();
-	fire::fire(sf::Vector2i the_source);
+	fire_node(){}
+	fire_node(sf::Vector2i new_pos);
+	bool update();
+	sf::Vector2i pos;
+	int duration;
+
+};
+
+class fire_source{
+public:
+	fire_source(){}
+	fire_source(sf::Vector2i the_source, int allowance, 
+		std::vector <std::vector <tile*>> &map);
+	bool update(std::vector <std::vector <tile*>> &map);
 
 private:
 	sf::Vector2i source;
-	std::vector <sf::Vector2i> invuls;
+	//std::vector <invul*> invuls;
+	std::vector <sf::Vector2i> range;
+	std::vector <fire_node*> nodes;
+	void set_range(int allowance, std::vector <std::vector <tile*>> &map);
 };
-*/
 
+
+class fire{
+public:
+	fire(){}
+	void update(std::vector<std::vector<tile*>> &map);
+	void start_fire(sf::Vector2i source, std::vector<std::vector<tile*>> &map);
+
+private:
+	std::vector <fire_source*> fires;
+};
 
 class tile{
 public:
@@ -42,11 +68,11 @@ public:
 	bool is_ignited(){return ignited;}
 	bool occupy();
 	bool ignite();
+	void extinguish();
 	void highlight();
 	void corrupt();
 	void update(std::vector <std::vector<tile*>> &map);
 	
-
 private:
 	bool occupied;
 	int  z;
@@ -56,7 +82,7 @@ private:
 	int corruption_cooldown;
 	sf::Vector2i coords;
 	bool ignited;
-	int firedur;
+//	int firedur;
 	bool highlighted;
 	int invulnerable;
 };

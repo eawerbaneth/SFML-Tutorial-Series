@@ -1,10 +1,14 @@
 #include "tile.h"
 
+class corrupted;
+
 class monk{
 public:
 	monk(){}
 	monk(tile* my_tile, sf::Image *Image, tile* destination);
 	monk(sf::Vector2i my_tile, sf::Vector2i my_dest, sf::Vector2f my_pos, sf::Image *Image);
+	monk(corrupted* c, sf::Image *Image);
+
 
 	//accessing privates
 	sf::Vector2f get_pos(){return Sprite.GetPosition();}
@@ -37,7 +41,7 @@ protected:
 class faithful: public monk{
 public:
 	faithful(){}
-	faithful(tile* my_tile, sf::Image *Image, tile* destination);
+	faithful(tile* my_tile, sf::Image *Image/*, tile* destination*/);
 	faithful(monk* old_monk, sf::Image* Image);
 	//accessing privates
 	bool is_selected(){return selected;}
@@ -46,7 +50,7 @@ public:
 	bool detonate(tile* target);
 	bool select();
 	//general update
-	bool update(std::vector <std::vector <tile*>> &map);
+	bool update(std::vector <std::vector <tile*>> &map, fire &the_fire);
 
 private:
 	bool selected;

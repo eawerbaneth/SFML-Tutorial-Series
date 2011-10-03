@@ -34,6 +34,21 @@ monk::monk(sf::Vector2i my_tile, sf::Vector2i my_dest, sf::Vector2f my_pos, sf::
 	Sprite.SetPosition(my_pos);
 }
 
+//purify a burning corrupted
+monk::monk(corrupted* c, sf::Image *Image){
+	Sprite.SetImage(*Image);
+	int xmod = 4;
+	tilecoords = c->get_tile();
+	destcoords = c->get_dest();
+	ignited = true;
+	death_walk=3;
+
+	Sprite.SetSubRect(sf::IntRect(xmod*citizen_dim, 0,
+		xmod*citizen_dim+citizen_dim, Image->GetHeight()));
+
+	Sprite.SetPosition(c->get_pos());
+}
+
 //try to move onto a new tile
 bool monk::request_occupy(tile* new_tile){
 	//if(new_tile->occupy()){
@@ -74,10 +89,10 @@ void monk::ignite(){
 }
 
 //faithful implementation
-faithful::faithful(tile* my_tile, sf::Image *Image, tile* destination){
+faithful::faithful(tile* my_tile, sf::Image *Image/*, tile* destination*/){
 	Sprite.SetImage(*Image);
 	tilecoords = my_tile->get_coords();
-	destcoords = destination->get_coords();
+	//destcoords = destination->get_coords();
 	selected = false;
 	detonated = false;
 	death_walk = 0;
@@ -94,7 +109,7 @@ faithful::faithful(tile* my_tile, sf::Image *Image, tile* destination){
 faithful::faithful(monk* old_monk, sf::Image *Image){
 	Sprite = old_monk->get_sprite();
 	tilecoords = old_monk->get_tile();
-	destcoords = old_monk->get_dest();
+	//destcoords = old_monk->get_dest();
 	selected = false;
 	detonated = false;
 	death_walk = 0;
@@ -228,11 +243,12 @@ bool faithful::detonate(tile* target){
 }
 
 //return true if it's time to die, else return false
-bool faithful::update(std::vector <std::vector <tile*>> &map){
+bool faithful::update(std::vector <std::vector <tile*>> &map, fire &the_fire){
 	//first check whether or not the monk has been detonated
 	if(detonated){
 		//we're going to set our current tile on fire
-		map[tilecoords.x][tilecoords.y]->ignite();
+		the_fire.start_fire(tilecoords, map);
+		//map[tilecoords.x][tilecoords.y]->ignite();
 		//check to see if it's time for us to die
 		if(death_walk>4)
 			return true;
