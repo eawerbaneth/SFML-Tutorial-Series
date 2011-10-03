@@ -13,6 +13,7 @@
 const int dim = 100;
 const int citizen_dim = 75;
 
+/*
 class fire{
 public:
 	fire::fire();
@@ -22,6 +23,7 @@ private:
 	sf::Vector2i source;
 	std::vector <sf::Vector2i> invuls;
 };
+*/
 
 
 class tile{
