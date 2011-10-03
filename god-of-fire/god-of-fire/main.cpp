@@ -4,6 +4,8 @@
 
 sf::Image tileset;
 sf::Image monk_sprites;
+sf::Image selector_image;
+
 float benevolence;
 float desolation;
 fire grand_fire;
@@ -22,6 +24,7 @@ void load_monks(std::vector <monk*> &monks, std::vector <std::vector<tile*>> &ma
 void printmap(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks);
 void printmapdynamic(sf::RenderWindow &screen, std::vector <std::vector <tile*>> &map, sf::View &View, 
 	std::vector <monk*> &monks, std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks);
+void draw_selector(sf::RenderWindow &screen, sf::Vector2f mouse_coords, sf::Sprite &selector);
 //void printmonks(sf::RenderWindow &screen, std::vector <monk*> &monks);
 //updates
 void monk_update(std::vector <std::vector <tile*>> &map, std::vector <monk*> &monks, std::vector <faithful*> &f_monks, std::vector <corrupted*> &c_monks);
@@ -38,14 +41,18 @@ void highlight_tiles(std::vector <std::vector<tile*>> &map, faithful* &chosen);
 //corrupted functions
 void corrupt(std::vector <monk*> &monks, int lost, std::vector <corrupted*> &c_monks);
 
+
 int main(){
 	//initalize the game window
 	sf::RenderWindow screen(sf::VideoMode(800, 600), "God of Fire");
 	screen.SetFramerateLimit(60);
 
 	//fun initializations
+	selector_image.LoadFromFile("imgs/selector.png");
 	sf::Vector2f old_mouse_coords;
 	sf::Vector2f mouse_coords;
+	sf::Sprite selector;
+	selector.SetImage(selector_image);
 	std::vector <std::vector <tile*>> map;
 	std::vector <monk*> monks;
 	int frames=0;
@@ -95,6 +102,8 @@ int main(){
 			handle_left_click(global_mouse, f_monks, selected, chosen, map);
 		}
 
+		
+
 		//handle highlighting tiles
 		if((!was_selected && selected) || (!selected && was_selected))
 			highlight_tiles(map, chosen);
@@ -122,12 +131,25 @@ int main(){
 		screen.Clear();
 		screen.SetView(View);	
 		printmapdynamic(screen, map, View, monks, f_monks, c_monks);
+		sf::Vector2f global_mouse(mouse_coords.x+View.GetRect().Left, mouse_coords.y+View.GetRect().Top);
+		draw_selector(screen, global_mouse, selector);
 		screen.SetView(screen.GetDefaultView());
 		screen.Display();
 
 	}
 
 	return 0;
+}
+
+//debugging
+void draw_selector(sf::RenderWindow &screen, sf::Vector2f global_mouse, sf::Sprite &selector){
+	int row = global_mouse.y /dim*4;
+	int col = global_mouse.x / dim;
+
+	std::cout << "Predicting mouse position at row " << row << ", col " << col << "\n";
+	selector.SetPosition(row*dim*4, col*dim*4);
+	screen.Draw(selector);
+
 }
 
 
