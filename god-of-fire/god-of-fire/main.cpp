@@ -40,6 +40,7 @@ void to_stray(std::vector<monk*> &monks, std::vector <faithful*> &f_monks);
 void highlight_tiles(std::vector <std::vector<tile*>> &map, faithful* &chosen);
 //corrupted functions
 void corrupt(std::vector <monk*> &monks, int lost, std::vector <corrupted*> &c_monks);
+void intro_screen(sf::RenderWindow &screen);
 
 
 int main(){
@@ -73,6 +74,8 @@ int main(){
 	bool was_selected = false;
 	sf::Clock click;
 	click.Reset();
+
+	intro_screen(screen);
 	
 	sf::Vector2i mapsize(map[0].size()*dim, map.size()*dim/4+dim);
 	
@@ -131,8 +134,9 @@ int main(){
 		screen.Clear();
 		screen.SetView(View);	
 		printmapdynamic(screen, map, View, monks, f_monks, c_monks);
-		sf::Vector2f global_mouse(mouse_coords.x+View.GetRect().Left, mouse_coords.y+View.GetRect().Top);
-		draw_selector(screen, global_mouse, selector);
+		sf::Vector2f global_mouse(mouse_coords.x+View.GetRect().Left, 
+				mouse_coords.y+View.GetRect().Top);
+		//draw_selector(screen, global_mouse, selector);
 		screen.SetView(screen.GetDefaultView());
 		screen.Display();
 
@@ -141,13 +145,37 @@ int main(){
 	return 0;
 }
 
+//intro scene
+void intro_screen(sf::RenderWindow &screen){
+	sf::Image title_img;
+	title_img.LoadFromFile("imgs/title.png");
+	sf::Sprite title(title_img, sf::Vector2f(0, 0));
+	sf::String hint("[Press any key to continue]");
+	hint.SetPosition((float)screen.GetWidth()/2-250, (float)screen.GetHeight()-100);
+
+	sf::Clock timer;
+	bool lock = true;
+	sf::Event Event;
+
+	while(lock){
+		float time=timer.GetElapsedTime();
+		if(time>2)
+			while(screen.GetEvent(Event))
+				if(Event.Type==sf::Event::KeyPressed)
+					lock=false;
+		screen.Clear();
+		screen.Draw(title);
+		if(time>3)
+			screen.Draw(hint);
+		screen.Display();
+	}
+
+}
+
+
 //debugging
 void draw_selector(sf::RenderWindow &screen, sf::Vector2f global_mouse, sf::Sprite &selector){
-	int row = global_mouse.y /dim*4;
-	int col = global_mouse.x / dim;
-
-	std::cout << "Predicting mouse position at row " << row << ", col " << col << "\n";
-	selector.SetPosition(row*dim*4, col*dim*4);
+	selector.SetPosition(global_mouse);
 	screen.Draw(selector);
 
 }
@@ -614,8 +642,9 @@ void handle_left_click(sf::Vector2f &global_mouse, std::vector <faithful*> &f_mo
 				chosen->get_pos().y+chosen->get_sprite().GetSize().x, 
 				chosen->get_pos().x+chosen->get_sprite().GetSize().y);
 			//if they clicked on the monk
-			if(chosen_rect.Contains(global_mouse.x, global_mouse.y))
+			if(chosen_rect.Contains(global_mouse.x, global_mouse.y)){
 				selected = chosen->select();
+			}
 			//figure out which tile they clicked on
 			else{
 				int row = global_mouse.y /dim*4;
