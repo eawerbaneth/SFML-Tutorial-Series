@@ -1,6 +1,5 @@
-#include "tile.h"
-#include "word.h"
-#include <vector>
+#include "hash.h"
+
 
 sf::Image tile_img;
 
