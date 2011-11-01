@@ -80,9 +80,12 @@ class player(object):
 			self.shoot_cooldown = 0.0
 			
 		if self.shoot == True and self.shoot_cooldown == 0.0:
-			pass
+			new_bullet = bullet(self.rect.left + 16, self.rect.top, math.pi/2)
+			self.projectiles.append(new_bullet)
+			self.shoot_cooldown = 2.0
 		for i, projectile in enumerate(self.projectiles):
-			pass
+			if not projectiles.update(FrameRate):
+				self.projectiles.pop(i)
 	
 	def draw(self, screen):
 		"""draws fighter"""
