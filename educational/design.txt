@@ -1,0 +1,16 @@
+educational game ideas
+
+--start out with some money and some initial upgrades to buy (all of them cosmetic)
+--you can go in to debt to get updates
+--there's a loan shark character who will give you a loan
+	--he charges a lot of interest
+--another loan shark starts to loan you more money to pay back the other loan shark
+--loan shark will start to repossess items and will take back the upgrades you bought
+--every time in between levels you need to repair your ship
+--the galactic federation comes and takes your ship if you're still in debt at the end 
+	of the fourth level, then they make you fly their crappier ship, and all the money 
+	you earn from then on goes to them.
+
+
+
+upgrades that actually matter you will have to save up for
