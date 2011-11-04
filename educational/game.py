@@ -1,6 +1,10 @@
 import sys
 import pygame
 import math
+from key_bindings import key_bindings
+from player import player
+from bullet import bullet
+from shop import Shop
 
 class game():
 
@@ -21,6 +25,17 @@ class game():
 		self.player_killed = False
 		self.in_level = False
 		
+		self.myshop = Shop()
+		self.shopactive = True
+		
+		#images 'n' such
+		self.background = pygame.image.load("img/space.png").convert()
+		self.deaddraw = True
+		self.deaddrawnum = 0 #makes player flicker when respawning
+		self.levelactive = False
+		self.oldflag = self.levelactive
+		
+		
 	def initialize_screen(self):
 		"""Initialize the window"""
 		self.screen = pygame.display.set_mode((self.windowx, self.windowy))
@@ -30,8 +45,20 @@ class game():
 	def draw(self):
 		"""Draw everything on screen"""
 		#Draw background
+		backrect = self.background.get_rect
+		ydisp = (self.distance/2)%backrect.height
+		ydisp2 = (self.distance/4)%backrect.height
+		self.screen.blit(self.background, pygame.Rect(0, ydisp, self.windowx, self.windowy))
+		self.screen.blit(self.background, pygame.Rect(100, ydisp - backrect.height,self.windowx, self.windowy))
 		#Draw player
+		if self.distance > self.last_Death + self.immortal_time or self.deaddraw
+			self.player.draw(self.screen)
+		self.deaddrawnum += 1
+		if self.deaddrawnum > 10:
+			self.deaddrawnum = 0
+			seld.deaddraw = not(self.deaddraw)
 		#Draw enemies
+		
 	
 	def update(self):
 		"""Update every frame"""
@@ -108,10 +135,15 @@ class game():
 			pass
 		self.clock.tick()
 		while self.no_exit:
-			self.handle_events()
-			self.update()
-			self.draw()
-			pygame.display.flip()
+			if (self.level_active):
+				self.handle_events()
+				self.update()
+				self.draw()
+				pygame.display.flip()
+			else:
+				myshop.activate(self.screen)
+				self.shopactive = False
+				
 			self.frametime = float(self.clock.tick(60))
 	
 	def exit_game(self):

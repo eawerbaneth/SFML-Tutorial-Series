@@ -1,5 +1,6 @@
 import pygame
 import math
+from bullet import bullet
 
 class player(object):
 	"""the player's fighter ship"""
@@ -30,6 +31,9 @@ class player(object):
 		FrameRate = FrameRate/100
 		self.frames += 1
 		
+		self.handle_shoot(FrameRate)
+		
+		return self.projectiles
 	
 	#MOVEMENT
 	def move(self, FrameRate):
@@ -92,5 +96,4 @@ class player(object):
 		screen.blit(self.image, self.rect, Pygame.Rect(0, 0, self.rect.width, self.rect.height))
 		
 		for projectile in self.projectiles:
-			pass
-			#projectile.draw(screen)
+			projectile.draw(screen)
