@@ -6,7 +6,7 @@ class player(object):
 	"""the player's fighter ship"""
 	def __init__(self, game):
 		self.energy = 0.0
-		self.image = pygame.image.load("imgs/fighter_proxy.png")
+		self.image = pygame.image.load("img/plane.png")
 		self.rect = self.image.get_rect()
 		self.rect.width = 60
 		#move koi to the middle of the screen

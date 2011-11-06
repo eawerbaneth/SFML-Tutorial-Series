@@ -5,9 +5,9 @@ class bullet(object):
     """the bullet class"""
     def __init__(self, x, y, ang):
         #pygame.sprite.Sprite.__init__(self) #call Sprite initializer
-        self.image = pygame.image.load("img/bullet.png")
+        self.image = pygame.image.load("img/ball.png")
         self.rect = self.image.get_rect()
-        #spawn bullet where koi fired it from
+        #spawn bullet where space guy fired it from
         self.rect.move_ip(x, y)
         self.angle = ang
         self.xvel = 70
