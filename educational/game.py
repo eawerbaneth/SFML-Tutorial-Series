@@ -27,12 +27,13 @@ class game():
         self.money = 0
         
         self.player = player(self)
+        self.key_bindings = key_bindings()
 		
         self.myshop = Shop(self.windowx, self.windowy)
         self.shopactive = True
 		
 		#images 'n' such
-        self.background = pygame.image.load("img/background.png")#.convert()
+        self.background = pygame.image.load("img/floor.png")#.convert()
         self.deaddraw = True
         self.deaddrawnum = 0 #makes player flicker when respawning
         self.levelactive = False
@@ -56,12 +57,12 @@ class game():
         self.screen.blit(self.background, pygame.Rect(0, ydisp, self.windowx, self.windowy))
         self.screen.blit(self.background, pygame.Rect(100, ydisp - backrect.height,self.windowx, self.windowy))
 		#Draw player
-        if self.distance > self.last_death + self.immortal_time or self.deaddraw:
+        if self.distance > self.last_death + self.immortal or self.deaddraw:
             self.player.draw(self.screen)
         self.deaddrawnum += 1
         if self.deaddrawnum > 10:
             self.deaddrawnum = 0
-            seld.deaddraw = not(self.deaddraw)
+            self.deaddraw = not(self.deaddraw)
 		#Draw enemies
         
 	
@@ -69,6 +70,7 @@ class game():
         """Update every frame"""
 		#update player
         self.distance += self.frametime
+        self.player.update(self.frametime)
         projectiles = []
         if self.lives > 0:
             projectiles = self.player.update(self.frametime)
@@ -81,7 +83,7 @@ class game():
             pygame.time.wait(2000)
             self.exit_game()
         if self.player_killed == True:
-            if self.distance > self.last_death + self.immortal_time:
+            if self.distance > self.last_death + self.immortal:
                 self.last_death = self.distance
                 self.lives -= 1
                 self.player_killed = False
@@ -100,25 +102,29 @@ class game():
         
     def handle_events(self):
         """Handle events (key presses, etc.)"""
+        print "handling events..."
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.exit_game()
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     self.exit_game()
-                if self.in_level == True:
 					#movement
-                    if event.key in self.key_bindings.up:
-                        self.player.moving[0] = True
-                    if event.key in self.key_bindings.down:
-                        self.player.moving[1] = True
-                    if event.key in self.key_bindings.left:
-                        self.player.moving[2] = True
-                    if event.key in self.key_bindings.right:
-                        self.player.moving[3] = True
-                    #abilities
-                    if event.key in self.key_bindings.shoot:
-                        self.player.shoot = True
+                if event.key in self.key_bindings.up:
+                    print "up"
+                    self.player.moving[0] = True
+                if event.key in self.key_bindings.down:
+                    print "down"
+                    self.player.moving[1] = True
+                if event.key in self.key_bindings.left:
+                    print "left"
+                    self.player.moving[2] = True
+                if event.key in self.key_bindings.right:
+                    print "right"
+                    self.player.moving[3] = True
+                #abilities
+                if event.key in self.key_bindings.shoot:
+                    self.player.shoot = True
             if event.type == pygame.KEYUP:
                 #cancelling movement
                 if event.key in self.key_bindings.up:

@@ -84,7 +84,7 @@ class Shark():
 						self.cursorpos = 0
 				if event.key == pygame.K_RIGHT:
 					if self.cursorpos == 0:
-						self.cursorpos == 1
+						self.cursorpos = 1
 				if event.key == pygame.K_RETURN:
 					if self.cursorpos == 0:
 						self.borrow()

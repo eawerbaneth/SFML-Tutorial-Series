@@ -8,7 +8,7 @@ class player(object):
 		self.energy = 0.0
 		self.image = pygame.image.load("img/plane.png")
 		self.rect = self.image.get_rect()
-		self.rect.width = 60
+		#self.rect.width = 60
 		#move koi to the middle of the screen
 		self.rect.move_ip(game.windowx/2-self.rect.width/2, game.windowy/2-self.rect.height/2)
 		self.xvel = 35
@@ -23,6 +23,7 @@ class player(object):
 		#animation utilities
 		self.game = game
 		self.frames = 0
+		self.game = game
 		
 		self.death = False
 		
@@ -30,7 +31,7 @@ class player(object):
 		"""handles input"""
 		FrameRate = FrameRate/100
 		self.frames += 1
-		
+		self.move(FrameRate)
 		self.handle_shoot(FrameRate)
 		
 		return self.projectiles
@@ -57,8 +58,8 @@ class player(object):
 			#down
 			elif self.moving[1]:
 				future = self.rect.move(0, self.yvel*FrameRate)
-				if(future.bottom>game.windowy):
-					self.rect.bottom = game.windowy
+				if(future.bottom>self.game.windowy):
+					self.rect.bottom = self.game.windowy
 				else:
 					self.rect = future
 		if not leftright_lock:
@@ -72,8 +73,8 @@ class player(object):
 			#right
 			elif self.moving[3]:
 				future = self.rect.move(self.xvel*FrameRate, 0)
-				if future.right > game.windowx:
-					self.rect.right = game.windowx
+				if future.right > self.game.windowx:
+					self.rect.right = self.game.windowx
 				else:
 					self.rect = future
 	
@@ -88,12 +89,12 @@ class player(object):
 			self.projectiles.append(new_bullet)
 			self.shoot_cooldown = 2.0
 		for i, projectile in enumerate(self.projectiles):
-			if not projectiles.update(FrameRate):
+			if not projectile.update(FrameRate):
 				self.projectiles.pop(i)
 	
 	def draw(self, screen):
 		"""draws fighter"""
-		screen.blit(self.image, self.rect, Pygame.Rect(0, 0, self.rect.width, self.rect.height))
+		screen.blit(self.image, self.rect, pygame.Rect(0, 0, self.rect.width, self.rect.height))
 		
 		for projectile in self.projectiles:
 			projectile.draw(screen)
