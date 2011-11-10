@@ -18,7 +18,7 @@ class player(object):
 		self.moving = [False, False, False, False]
 		#shooting
 		self.shoot = False
-		self.shoot_cooldown = 0.75
+		self.shoot_cooldown = 1.25
 		self.projectiles = []
 		#animation utilities
 		self.game = game

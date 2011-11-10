@@ -10,16 +10,20 @@ class bullet(object):
         #spawn bullet where space guy fired it from
         self.rect.move_ip(x, y)
         self.angle = ang
-        self.xvel = 70
-        self.yvel = 70
+        self.xvel = 35
+        self.yvel = 35
+        self.hit = False
 
     def update(self, FrameRate):
         """updates bullet"""
-        #FrameRate = FrameRate/100 #framerate should already be in right format by the time we pass here
+        #FrameRate = FrameRate/100
         return self.move(FrameRate)
         
     def move(self, FrameRate):
         """moves bullet along its trajectory"""
+        if self.hit == True:
+            return False
+		
         self.rect.move_ip(self.xvel*math.cos(self.angle)*FrameRate, -self.yvel*math.sin(self.angle)*FrameRate)
         if self.rect.left < 0:
             return False
