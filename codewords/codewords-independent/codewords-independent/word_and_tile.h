@@ -13,7 +13,7 @@ public:
 	sf::Vector2f get_coords(){return coords;}
 	void set_letter(char n_letter){letter=n_letter;}
 	char get_real_let(){return real_let;}
-	void draw(sf::RenderWindow* &screen);
+	void draw(sf::RenderWindow &screen);
 
 private:
 	sf::Vector2f coords;
@@ -25,13 +25,13 @@ private:
 };
 
 // -- draws new tile --
-void tile::draw(sf::RenderWindow* &screen){
+void tile::draw(sf::RenderWindow &screen){
 	std::string bleh = "" + letter;
 	sf::String str(bleh);
 	str.SetScale(3, 3);
 	str.SetPosition(coords.x+25, coords.y+25);
-	screen->Draw(*sprite);
-	screen->Draw(str);
+	screen.Draw(*sprite);
+	screen.Draw(str);
 }
 
 // -- tile constructor --
@@ -54,7 +54,8 @@ public:
 	void erase_word();
 	sf::Vector2i get_start(){return start;}
 	sf::Vector2i get_end(){return end;}
-	void print_word(sf::RenderWindow* &screen);
+	void print_word(sf::RenderWindow &screen);
+	std::string get_content(){return content;}
 
 private:
 	//start and end coordinates of the word
@@ -68,7 +69,7 @@ private:
 };
 
 // -- draws all of the letters in the word --
-void word::print_word(sf::RenderWindow* &screen){
+void word::print_word(sf::RenderWindow &screen){
 	for(unsigned int i=0; i<placement.size(); i++)
 		placement[i].draw(screen);
 }
