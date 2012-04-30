@@ -1,34 +1,29 @@
-﻿Build started 11/19/2011 1:56:20 AM.
-     1>Project "C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\codewords-independent\codewords-independent.vcxproj" on node 2 (build target(s)).
-     1>InitializeBuildStatus:
+﻿Build started 4/29/2012 8:45:40 PM.
+     1>Project "C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\codewords-independent\codewords-independent.vcxproj" on node 2 (rebuild target(s)).
+     1>_PrepareForClean:
+         Deleting file "Debug\codewords-independent.lastbuildstate".
+       InitializeBuildStatus:
          Creating "Debug\codewords-independent.unsuccessfulbuild" because "AlwaysCreate" was specified.
        ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /Od /Oy- /D SFML_DYNAMIC /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt "independent-main.cpp"
          independent-main.cpp
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_and_tile.h(85): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_and_tile.h(85): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(47): warning C4018: '<=' : signed/unsigned mismatch
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(49): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(49): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(71): warning C4018: '<=' : signed/unsigned mismatch
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(73): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
-     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(73): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
-       ManifestResourceCompile:
-         All outputs are up-to-date.
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\Debug\codewords-independent.exe" /INCREMENTAL /NOLOGO /LIBPATH:"C:\repo\SFML-Tutorial-Series\sfml-fight-release\sfml-fight-release\SFML-1.6\lib" "sfml-system-d.lib" "sfml-main-d.lib" "sfml-graphics-d.lib" "sfml-audio-d.lib" "sfml-network-d.lib" "sfml-window-d.lib" kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /ManifestFile:"Debug\codewords-independent.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\Debug\codewords-independent.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\Debug\codewords-independent.lib" /MACHINE:X86 "Debug\codewords-independent.exe.embed.manifest.res"
-         "Debug\independent-main.obj"
-       Manifest:
-         C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\mt.exe /nologo /verbose /out:"Debug\codewords-independent.exe.embed.manifest" /manifest "Debug\codewords-independent.exe.intermediate.manifest"
-         All outputs are up-to-date.
-       LinkEmbedManifest:
-         All outputs are up-to-date.
-         codewords-independent.vcxproj -> C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\Debug\codewords-independent.exe
-       FinalizeBuildStatus:
-         Deleting file "Debug\codewords-independent.unsuccessfulbuild".
-         Touching "Debug\codewords-independent.lastbuildstate".
-     1>Done Building Project "C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\codewords-independent\codewords-independent.vcxproj" (build target(s)).
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_and_tile.h(86): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_and_tile.h(86): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_storage.h(23): warning C4832: token '.' is illegal after UDT 'sf::Randomizer'
+                 C:\repo\SFML-Tutorial-Series\sfml-fight-release\sfml-fight-release\SFML-1.6\include\SFML/System/Randomizer.hpp(41) : see declaration of 'sf::Randomizer'
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_storage.h(23): error C2275: 'sf::Randomizer' : illegal use of this type as an expression
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\word_storage.h(23): error C2228: left of '.Random' must have class/struct/union
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(32): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(33): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(57): warning C4018: '<' : signed/unsigned mismatch
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(103): warning C4018: '<=' : signed/unsigned mismatch
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(105): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(105): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(127): warning C4018: '<=' : signed/unsigned mismatch
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(129): warning C4244: 'argument' : conversion from 'int' to 'float', possible loss of data
+     1>c:\repo\sfml-tutorial-series\codewords\codewords-independent\codewords-independent\board.h(129): warning C4244: 'argument' : conversion from 'unsigned int' to 'float', possible loss of data
+     1>Done Building Project "C:\repo\SFML-Tutorial-Series\codewords\codewords-independent\codewords-independent\codewords-independent.vcxproj" (rebuild target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:01.54
+Time Elapsed 00:00:01.27
