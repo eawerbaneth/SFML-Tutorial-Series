@@ -1,0 +1,83 @@
+<CoordinateSystem> { Y-Up }
+
+<Group> Object0 {
+	<VertexPool> Object0.verts {
+		<Vertex> 0 {
+			-5 -5 -5
+			<Normal> { 0 -0.707107 -0.707107 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 1 {
+			-5 -5 5
+			<Normal> { -0.57735 -0.57735 0.57735 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 2 {
+			-5 5 5
+			<Normal> { 0 0.447214 0.894427 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 3 {
+			5 5 -5
+			<Normal> { 0.408248 0.408248 -0.816497 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 4 {
+			-8.83232 24.6512 -11.4157
+			<Normal> { 0.408248 0.816497 -0.408248 }
+			<RGBA> { 0 0 1 1 }
+		}
+		<Vertex> 5 {
+			5 -5 5
+			<Normal> { 0.333333 -0.666667 0.666667 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 6 {
+			5 -5 -5
+			<Normal> { 0.816497 -0.408248 -0.408248 }
+			<RGBA> { 1 0 0 1 }
+		}
+		<Vertex> 7 {
+			5 5 5
+			<Normal> { 0.666667 0.666667 0.333333 }
+			<RGBA> { 1 0 0 1 }
+		}
+	}
+	<Polygon> {
+		<VertexRef> { 0 1 2 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 3 0 4 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 5 0 6 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 3 6 0 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 4 2 0 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 5 1 0 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 2 1 5 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 7 6 3 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 6 7 5 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 7 3 4 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 7 4 2 <Ref> { Object0.verts } }
+	}
+	<Polygon> {
+		<VertexRef> { 7 2 5 <Ref> { Object0.verts } }
+	}
+	}
+}

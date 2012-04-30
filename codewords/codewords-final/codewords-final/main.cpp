@@ -447,9 +447,6 @@ public:
 			if(bottom_tiles[i].WasClicked(mouse_coords)){
 				selected_tile = &bottom_tiles[i];
 			}
-				
-
-		
 	}
 
 	//eventually you just need to pick 3 random contiguous letters

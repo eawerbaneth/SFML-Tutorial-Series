@@ -1,4 +1,4 @@
-﻿Build started 4/30/2012 2:35:14 AM.
+﻿Build started 4/30/2012 12:00:47 PM.
      1>Project "C:\repo\SFML-Tutorial-Series\codewords\codewords-final\codewords-final\codewords-final.vcxproj" on node 2 (build target(s)).
      1>InitializeBuildStatus:
          Creating "Debug\codewords-final.unsuccessfulbuild" because "AlwaysCreate" was specified.
@@ -18,4 +18,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.76
+Time Elapsed 00:00:02.60

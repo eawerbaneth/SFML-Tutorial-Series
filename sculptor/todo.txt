@@ -1,0 +1,8 @@
+sculptor to-do
+
+- figure out if I can use a VBO
+- Alt-Camera Controls
+- switch between polygon and wireframe modes
+- add another object
+- add params/console options
+- make it so you switch to select mode when you switch types
